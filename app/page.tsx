@@ -36,7 +36,7 @@ export default function HomePage() {
               BugLab
             </span>
             <a
-              href="https://github.com"
+              href="https://github.com/HenryD11703/BugLab"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[10px] tracking-[0.15em] uppercase text-[#6B6B6B] hover:text-[#E63329] transition-colors"
@@ -74,9 +74,11 @@ export default function HomePage() {
                 style={{ fontFamily: "var(--font-space-grotesk), sans-serif" }}
               >
                 BugLab challenges your ability to{" "}
-                <strong className="text-[#0A0A0A] font-semibold">write</strong> and{" "}
-                <strong className="text-[#0A0A0A] font-semibold">review</strong> code — not just
-                memorize algorithms. Each exercise starts with a broken snippet. You fix it.
+                <strong className="text-[#0A0A0A] font-semibold">write</strong>{" "}
+                and{" "}
+                <strong className="text-[#0A0A0A] font-semibold">review</strong>{" "}
+                code — not just memorize algorithms. Each exercise starts with a
+                broken snippet. You fix it.
               </p>
             </div>
 
@@ -91,7 +93,9 @@ export default function HomePage() {
                 <div key={label}>
                   <div
                     className="text-2xl font-bold text-[#0A0A0A] tracking-[-0.02em]"
-                    style={{ fontFamily: "var(--font-space-grotesk), sans-serif" }}
+                    style={{
+                      fontFamily: "var(--font-space-grotesk), sans-serif",
+                    }}
                   >
                     {value}
                   </div>
