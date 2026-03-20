@@ -1,0 +1,36 @@
+{
+  "title": "Zero Product",
+  "difficulty": "easy",
+  "tags": ["loops", "accumulator", "math"],
+  "description": "The function `running_product(numbers)` should return a new list where each element is the product of all elements up to and including that index.\n\nSo `[2, 3, 4]` should produce `[2, 6, 24]` — because 2, then 2×3=6, then 6×4=24.\n\nInstead, it **always returns a list of zeros**, regardless of the input. The loop is correct. The logic is correct. There is one wrong starting value.",
+  "hints": [
+    "Try `running_product([2, 3, 4])`. You should get `[2, 6, 24]`. What do you actually get? What is the very first value in the result?",
+    "The accumulator starts at `0`. Multiplying `0 × 2 = 0`, then `0 × 3 = 0`, then `0 × 4 = 0`. Zero multiplied by anything is still zero — the initial value poisons every result.",
+    "For multiplication, the identity element (the neutral starting value) is `1`, not `0`. Change `product = 0` to `product = 1`."
+  ],
+  "tests": [
+    {
+      "description": "basic running product",
+      "input": "running_product([2, 3, 4])",
+      "expectedOutput": "[2, 6, 24]"
+    },
+    {
+      "description": "includes a 1 — no change in product",
+      "input": "running_product([1, 5, 2])",
+      "expectedOutput": "[1, 5, 10]"
+    },
+    {
+      "description": "single element",
+      "input": "running_product([7])",
+      "expectedOutput": "[7]"
+    },
+    {
+      "description": "doubling sequence",
+      "input": "running_product([2, 2, 2, 2])",
+      "expectedOutput": "[2, 4, 8, 16]"
+    }
+  ],
+  "requirements": {
+    "mustContainKeyword": ["for"]
+  }
+}

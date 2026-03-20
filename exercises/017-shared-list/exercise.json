@@ -1,0 +1,36 @@
+{
+  "title": "The Shared Row",
+  "difficulty": "hard",
+  "tags": ["lists", "references", "mutation", "gotcha"],
+  "description": "The function `create_board(size)` creates a square game board filled with zeros and places a `1` in the center cell. Only the center cell should be `1` — all other cells should be `0`.\n\nInstead, **every row in the board gets the `1`**, not just the middle one. Changing one cell somehow changes all of them.\n\nThe board-creation line looks completely normal. What is `* size` actually doing to the rows?",
+  "hints": [
+    "Try `create_board(3)`. You should get `[[0, 0, 0], [0, 1, 0], [0, 0, 0]]`. What do you actually get? How many rows have a `1`?",
+    "`[[0] * size] * size` does NOT create `size` independent rows. It creates a list containing `size` references to the **exact same list object**. When you modify any row, you're modifying the one list that all rows point to.",
+    "Create each row independently with a list comprehension: `board = [[0] * size for _ in range(size)]`. Each iteration creates a fresh list, so the rows are truly independent."
+  ],
+  "tests": [
+    {
+      "description": "3x3 board — only center modified",
+      "input": "create_board(3)",
+      "expectedOutput": "[[0, 0, 0], [0, 1, 0], [0, 0, 0]]"
+    },
+    {
+      "description": "first row must be untouched",
+      "input": "create_board(3)[0]",
+      "expectedOutput": "[0, 0, 0]"
+    },
+    {
+      "description": "1x1 board",
+      "input": "create_board(1)",
+      "expectedOutput": "[[1]]"
+    },
+    {
+      "description": "5x5 — top row must be all zeros",
+      "input": "create_board(5)[0]",
+      "expectedOutput": "[0, 0, 0, 0, 0]"
+    }
+  ],
+  "requirements": {
+    "mustContainKeyword": ["for"]
+  }
+}

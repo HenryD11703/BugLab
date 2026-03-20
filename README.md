@@ -49,7 +49,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Exercises
 
-There are currently **7 exercises** spanning three difficulty levels:
+There are currently **20 exercises** spanning three difficulty levels:
 
 | ID | Title | Difficulty | Concept |
 |---|---|---|---|
@@ -60,6 +60,19 @@ There are currently **7 exercises** spanning three difficulty levels:
 | 005 | One Too Many | Medium | Counter initialized to 1 instead of 0 |
 | 006 | Closure Trap | Hard | Lambda captures loop variable by reference |
 | 007 | Vanishing Elements | Hard | Modifying a list while iterating over it |
+| 008 | Exhausted | Hard | Generator expressions can only be iterated once |
+| 009 | Identity Crisis | Medium | `is` checks identity, not value equality |
+| 010 | Almost Equal | Medium | Comparing floats with `==` fails due to precision |
+| 011 | Sorted by Nothing | Easy | `list.sort()` returns `None`, not the sorted list |
+| 012 | The Lost Return | Medium | Missing `return` in a recursive branch |
+| 013 | Zero Product | Easy | Wrong identity element for multiplication |
+| 014 | Wrong by Design | Easy | Operator precedence: `a + b + c / 3` |
+| 015 | Read-Only | Easy | Strings are immutable — item assignment crashes |
+| 016 | Missing Key | Medium | `dict[key] += 1` raises `KeyError` on first occurrence |
+| 017 | The Shared Row | Hard | `[row] * n` creates shared references, not copies |
+| 018 | Wrong Rank | Easy | `enumerate` starts at `0` — ranks need `start=1` |
+| 019 | Misleading Truth | Easy | Truthiness check passes for negative numbers |
+| 020 | The Ignored Stars | Medium | List passed as one arg instead of unpacked with `*` |
 
 ---
 

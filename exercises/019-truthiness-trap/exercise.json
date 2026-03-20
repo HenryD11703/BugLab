@@ -1,0 +1,36 @@
+{
+  "title": "Misleading Truth",
+  "difficulty": "easy",
+  "tags": ["booleans", "truthiness", "comparison"],
+  "description": "The function `is_positive(n)` should return `True` if `n` is strictly greater than zero, and `False` for zero and all negative numbers.\n\nIt works correctly for positive numbers and for zero. But it **incorrectly returns `True` for negative numbers**.\n\nIn Python, many values are considered \"truthy\" — but truthy and positive are not the same thing.",
+  "hints": [
+    "Try `is_positive(-5)`. What does it return? What should it return? Now try `is_positive(-0.1)`. Same problem?",
+    "`if n:` evaluates to `True` for any non-zero number — including `-5`, `-100`, `-0.001`. \"Non-zero\" is not the same as \"positive\".",
+    "Replace the truthiness check with an actual comparison: `return n > 0`. Only use `if n:` when you want to check for any non-empty, non-zero, non-None value — not when you mean \"greater than zero\"."
+  ],
+  "tests": [
+    {
+      "description": "positive number",
+      "input": "is_positive(5)",
+      "expectedOutput": "True"
+    },
+    {
+      "description": "zero is not positive",
+      "input": "is_positive(0)",
+      "expectedOutput": "False"
+    },
+    {
+      "description": "negative integer — the trap",
+      "input": "is_positive(-3)",
+      "expectedOutput": "False"
+    },
+    {
+      "description": "negative float — the trap",
+      "input": "is_positive(-0.001)",
+      "expectedOutput": "False"
+    }
+  ],
+  "requirements": {
+    "mustContainKeyword": [">"]
+  }
+}

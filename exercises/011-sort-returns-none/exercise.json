@@ -1,0 +1,36 @@
+{
+  "title": "Sorted by Nothing",
+  "difficulty": "easy",
+  "tags": ["lists", "sorting", "methods", "gotcha"],
+  "description": "The function `get_median(numbers)` should return the median value of a list of numbers. For odd-length lists, the median is the middle element; for even-length lists, it is the average of the two middle elements.\n\nThe function **crashes immediately** on any input with a `TypeError`.\n\nCan you find the single-word fix that makes it work?",
+  "hints": [
+    "Call `get_median([3, 1, 4])`. Read the error message carefully — it tells you the type of `sorted_nums`. What type is it?",
+    "Python's `list.sort()` sorts the list **in place** and returns `None`. The return value is not the sorted list — it's nothing. So `sorted_nums` ends up as `None`, and indexing `None` crashes.",
+    "Use the built-in `sorted()` function instead: `sorted_nums = sorted(numbers)`. Unlike `.sort()`, `sorted()` returns a **new sorted list** and leaves the original unchanged."
+  ],
+  "tests": [
+    {
+      "description": "odd length — middle element",
+      "input": "get_median([3, 1, 4, 1, 5])",
+      "expectedOutput": "3"
+    },
+    {
+      "description": "even length — average of two middle",
+      "input": "get_median([1, 2, 3, 4])",
+      "expectedOutput": "2.5"
+    },
+    {
+      "description": "single element",
+      "input": "get_median([7])",
+      "expectedOutput": "7"
+    },
+    {
+      "description": "two elements",
+      "input": "get_median([2, 1])",
+      "expectedOutput": "1.5"
+    }
+  ],
+  "requirements": {
+    "mustContainKeyword": ["sorted"]
+  }
+}

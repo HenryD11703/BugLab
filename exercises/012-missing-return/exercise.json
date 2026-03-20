@@ -1,0 +1,36 @@
+{
+  "title": "The Lost Return",
+  "difficulty": "medium",
+  "tags": ["recursion", "control-flow", "functions"],
+  "description": "The function `find_max(lst)` should recursively find and return the maximum value in a non-empty list.\n\nWhen the largest element happens to be at index `0`, it works. For any other list — where the maximum is somewhere in the middle or at the end — **it returns `None`**.\n\nThe recursive logic is correct. The base case is correct. There is exactly one line missing.",
+  "hints": [
+    "Try `find_max([5, 3, 1])` (max at front — works) and `find_max([1, 5, 3])` (max in middle — fails). What does the second one return?",
+    "When `lst[0]` is NOT the maximum, the `if` branch is skipped. Python functions that reach the end without a `return` statement implicitly return `None`. The recursive result `rest_max` is computed correctly — but never returned.",
+    "After the `if` block, add `return rest_max`. Every code path in a value-returning function must explicitly return something."
+  ],
+  "tests": [
+    {
+      "description": "max is in the middle",
+      "input": "find_max([1, 9, 3])",
+      "expectedOutput": "9"
+    },
+    {
+      "description": "max is at the end",
+      "input": "find_max([3, 1, 4, 1, 5])",
+      "expectedOutput": "5"
+    },
+    {
+      "description": "max is at the front",
+      "input": "find_max([9, 3, 1])",
+      "expectedOutput": "9"
+    },
+    {
+      "description": "single element",
+      "input": "find_max([42])",
+      "expectedOutput": "42"
+    }
+  ],
+  "requirements": {
+    "mustUseRecursion": true
+  }
+}

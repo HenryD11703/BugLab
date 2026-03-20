@@ -1,0 +1,34 @@
+{
+  "title": "Read-Only",
+  "difficulty": "easy",
+  "tags": ["strings", "immutability", "types"],
+  "description": "The function `toggle_case_first(s)` should return a new string where the first character's case is toggled — uppercase becomes lowercase, lowercase becomes uppercase. The rest of the string stays the same.\n\nThe function **crashes immediately** with a `TypeError`. Why can't Python do what the code is asking?",
+  "hints": [
+    "Run the function with any string. Read the error message: *'str' object does not support item assignment*. What does 'item assignment' mean here?",
+    "Strings in Python are **immutable** — they cannot be modified after creation. You cannot assign to individual characters like `s[0] = 'X'`. Every string operation must produce a new string.",
+    "Instead of modifying in place, build and return a new string using slicing: `return s[0].lower() + s[1:]` (or `.upper()`). `s[1:]` gives you everything from index 1 to the end."
+  ],
+  "tests": [
+    {
+      "description": "uppercase first -> lowercase",
+      "input": "toggle_case_first('Hello')",
+      "expectedOutput": "hello"
+    },
+    {
+      "description": "lowercase first -> uppercase",
+      "input": "toggle_case_first('world')",
+      "expectedOutput": "World"
+    },
+    {
+      "description": "rest of string unchanged",
+      "input": "toggle_case_first('Python')",
+      "expectedOutput": "python"
+    },
+    {
+      "description": "single character",
+      "input": "toggle_case_first('a')",
+      "expectedOutput": "A"
+    }
+  ],
+  "requirements": {}
+}

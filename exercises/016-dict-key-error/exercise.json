@@ -1,0 +1,36 @@
+{
+  "title": "Missing Key",
+  "difficulty": "medium",
+  "tags": ["dicts", "KeyError", "methods"],
+  "description": "The function `word_frequency(words)` should take a list of words and return a dictionary mapping each word to how many times it appears.\n\nIt **crashes on the very first word** every single time. The error happens on a line that looks perfectly logical.\n\nWhy does Python refuse to increment something that doesn't exist yet?",
+  "hints": [
+    "Try `word_frequency([\"hello\"])`. What error do you get? Which line causes it? Think about what `freq[word]` does when `word` is not yet a key in `freq`.",
+    "`freq[word] += 1` expands to `freq[word] = freq[word] + 1`. Reading `freq[word]` raises a `KeyError` if the key doesn't exist — which it doesn't the first time any new word is encountered.",
+    "Use `dict.get(key, default)` to safely read with a fallback: `freq[word] = freq.get(word, 0) + 1`. If the word isn't in the dict yet, `.get` returns `0` instead of raising an error."
+  ],
+  "tests": [
+    {
+      "description": "mixed frequencies",
+      "input": "word_frequency(['a', 'b', 'a', 'c', 'b', 'a'])",
+      "expectedOutput": "{'a': 3, 'b': 2, 'c': 1}"
+    },
+    {
+      "description": "single word",
+      "input": "word_frequency(['hello'])",
+      "expectedOutput": "{'hello': 1}"
+    },
+    {
+      "description": "empty list",
+      "input": "word_frequency([])",
+      "expectedOutput": "{}"
+    },
+    {
+      "description": "all same word",
+      "input": "word_frequency(['x', 'x', 'x'])",
+      "expectedOutput": "{'x': 3}"
+    }
+  ],
+  "requirements": {
+    "mustContainKeyword": [".get"]
+  }
+}
