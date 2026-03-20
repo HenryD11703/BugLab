@@ -1,17 +1,16 @@
+import Link from "next/link";
 import { getAllExercises } from "@/lib/exercises";
-import ExerciseList from "@/components/ExerciseList";
+import ExerciseGrid from "@/components/ExerciseGrid";
 
 export default function HomePage() {
   const exercises = getAllExercises();
 
-  // Pass only what the client needs — no buggyCode, no hints, no full tests.
-  // At 1000 exercises this stays ~200KB and filters instantly client-side.
-  const exerciseMetas = exercises.map((ex) => ({
+  const exerciseItems = exercises.map((ex) => ({
     id: ex.id,
     title: ex.title,
     difficulty: ex.difficulty,
     tags: ex.tags,
-    description: ex.description.slice(0, 200),
+    description: ex.description,
     testCount: ex.tests.length,
   }));
 
@@ -35,15 +34,24 @@ export default function HomePage() {
             >
               BugLab
             </span>
-            <a
-              href="https://github.com/HenryD11703/BugLab"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[10px] tracking-[0.15em] uppercase text-[#6B6B6B] hover:text-[#E63329] transition-colors"
-              style={{ fontFamily: "var(--font-space-mono), monospace" }}
-            >
-              GitHub ↗
-            </a>
+            <div className="flex items-center gap-5">
+              <Link
+                href="/search"
+                className="text-[10px] tracking-[0.15em] uppercase text-[#6B6B6B] hover:text-[#0A0A0A] transition-colors"
+                style={{ fontFamily: "var(--font-space-mono), monospace" }}
+              >
+                Search
+              </Link>
+              <a
+                href="https://github.com/HenryD11703/BugLab"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] tracking-[0.15em] uppercase text-[#6B6B6B] hover:text-[#E63329] transition-colors"
+                style={{ fontFamily: "var(--font-space-mono), monospace" }}
+              >
+                GitHub ↗
+              </a>
+            </div>
           </nav>
 
           {/* Hero content */}
@@ -112,7 +120,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Exercise list — client component handles search + filter */}
+      {/* Exercise grid */}
       <div className="max-w-5xl mx-auto px-8 py-10">
         {exercises.length === 0 ? (
           <div className="text-center py-20">
@@ -125,7 +133,7 @@ export default function HomePage() {
             </p>
           </div>
         ) : (
-          <ExerciseList exercises={exerciseMetas} />
+          <ExerciseGrid exercises={exerciseItems} />
         )}
       </div>
 
