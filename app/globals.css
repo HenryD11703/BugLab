@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+@import "tailwindcss";
+
+:root {
+  --bg: #FAFAFA;
+  --text: #0A0A0A;
+  --accent: #E63329;
+  --muted: #6B6B6B;
+  --border: #0A0A0A;
+  --surface: #F0F0F0;
+  --code-bg: #111111;
+  --code-text: #FAFAFA;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* CodeMirror overrides */
+.cm-editor {
+  height: 100% !important;
+  font-family: 'Space Mono', monospace !important;
+  font-size: 0.8125rem !important;
+}
+.cm-editor.cm-focused {
+  outline: none !important;
+}
+.cm-scroller {
+  font-family: 'Space Mono', monospace !important;
+  overflow: auto !important;
+}
+.cm-content {
+  padding: 1rem !important;
+}
+.cm-line {
+  line-height: 1.7 !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cccccc;
+}

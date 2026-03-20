@@ -1,0 +1,36 @@
+{
+  "title": "The Haunted List",
+  "difficulty": "medium",
+  "tags": ["functions", "defaults", "gotcha"],
+  "description": "The function `append_to` should take an element and an optional list, append the element to it, and return the result.\n\nWhen called **without** a second argument, it should always start fresh with an empty list.\n\nBut something strange is happening — it seems to **remember** values between calls. How?",
+  "hints": [
+    "Call `append_to(1)` three times in a row and observe the return value each time. What do you notice?",
+    "In Python, default argument values are evaluated **once** when the function is defined — not every time the function is called. So `to=[]` creates one list that persists across all calls.",
+    "The fix: use `None` as the default, then assign a new `[]` inside the function body if `to` is `None`."
+  ],
+  "tests": [
+    {
+      "description": "first call returns one element",
+      "input": "append_to(1)",
+      "expectedOutput": "[1]"
+    },
+    {
+      "description": "second call with same signature is independent",
+      "input": "append_to(2)",
+      "expectedOutput": "[2]"
+    },
+    {
+      "description": "explicit list is used as-is",
+      "input": "append_to(3, [10, 20])",
+      "expectedOutput": "[10, 20, 3]"
+    },
+    {
+      "description": "third independent call",
+      "input": "append_to(99)",
+      "expectedOutput": "[99]"
+    }
+  ],
+  "requirements": {
+    "mustContainKeyword": ["None"]
+  }
+}

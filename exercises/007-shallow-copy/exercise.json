@@ -1,0 +1,41 @@
+{
+  "title": "Vanishing Elements",
+  "difficulty": "hard",
+  "tags": ["lists", "iteration", "mutation"],
+  "description": "The function `remove_negatives(numbers)` should return a list with all negative numbers removed.\n\nIt seems to work for some inputs, but with others **some negatives survive** even though the code clearly checks every element.\n\nThis is a particularly nasty bug — the code looks completely correct. The logic is right. **Yet the output is wrong.**",
+  "hints": [
+    "Try `remove_negatives([-1, -2, 3])`. Do you get `[3]`? What do you actually get?",
+    "What happens to the list's internal index counter when you call `numbers.remove(n)` during iteration? The list shrinks — but the iterator doesn't know that.",
+    "When you remove `-1` (index 0), the list becomes `[-2, 3]` and the iterator advances to index 1, which is now `3`. It **skips** `-2` entirely. Never mutate a collection while iterating it. Build a new list instead."
+  ],
+  "tests": [
+    {
+      "description": "consecutive negatives are the trap",
+      "input": "remove_negatives([-1, -2, 3])",
+      "expectedOutput": "[3]"
+    },
+    {
+      "description": "all positive — no change",
+      "input": "remove_negatives([1, 2, 3])",
+      "expectedOutput": "[1, 2, 3]"
+    },
+    {
+      "description": "all negative — empty result",
+      "input": "remove_negatives([-5, -3, -1])",
+      "expectedOutput": "[]"
+    },
+    {
+      "description": "mixed",
+      "input": "remove_negatives([4, -1, 5, -2, 6])",
+      "expectedOutput": "[4, 5, 6]"
+    },
+    {
+      "description": "zero is not negative",
+      "input": "remove_negatives([-1, 0, 1])",
+      "expectedOutput": "[0, 1]"
+    }
+  ],
+  "requirements": {
+    "mustContainKeyword": ["for"]
+  }
+}

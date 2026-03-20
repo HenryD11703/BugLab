@@ -1,0 +1,36 @@
+{
+  "title": "Closure Trap",
+  "difficulty": "hard",
+  "tags": ["closures", "functions", "scope"],
+  "description": "The function `make_multipliers(n)` should return a list of `n` functions, where the i-th function multiplies its argument by `i`.\n\nSo `make_multipliers(4)[2](5)` should return `10` (2 × 5). But every single function in the list behaves identically — they all multiply by the **same** number.\n\nThis is one of Python's most infamous gotchas. The code looks right. But it isn't.",
+  "hints": [
+    "Call `make_multipliers(3)` and then call each function with the same argument, say `10`. What do all three return?",
+    "The `lambda x: x * i` captures `i` by **reference**, not by value. When the lambda is finally called, `i` has already reached its last value from the loop.",
+    "Fix: capture the current value of `i` at lambda creation time using a default argument: `lambda x, i=i: x * i`. Default arguments are evaluated when the function is defined."
+  ],
+  "tests": [
+    {
+      "description": "zeroth multiplier multiplies by 0",
+      "input": "make_multipliers(4)[0](10)",
+      "expectedOutput": "0"
+    },
+    {
+      "description": "first multiplier multiplies by 1",
+      "input": "make_multipliers(4)[1](5)",
+      "expectedOutput": "5"
+    },
+    {
+      "description": "second multiplier multiplies by 2",
+      "input": "make_multipliers(4)[2](3)",
+      "expectedOutput": "6"
+    },
+    {
+      "description": "third multiplier multiplies by 3",
+      "input": "make_multipliers(4)[3](7)",
+      "expectedOutput": "21"
+    }
+  ],
+  "requirements": {
+    "mustContainKeyword": ["lambda", "for"]
+  }
+}

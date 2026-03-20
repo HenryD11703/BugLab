@@ -1,0 +1,57 @@
+{
+  "title": "Is It Prime?",
+  "difficulty": "medium",
+  "tags": ["math", "loops", "conditions"],
+  "description": "The function `is_prime(n)` should return `True` if `n` is a prime number, `False` otherwise.\n\nThere are **two bugs** hidden in this function. One causes incorrect results for small inputs. The other makes the function silently accept some **composite numbers** as prime.\n\n**Find and fix both bugs.**",
+  "hints": [
+    "By definition, numbers less than 2 are **not** prime. What does this function return for `0` and `1`?",
+    "Now try `is_prime(4)` and `is_prime(9)`. Both are composite — but the function says they're prime. Why would the loop miss them?",
+    "The loop checks divisors up to `int(n**0.5)` — but the square root itself is never checked. `int(4**0.5)` is `2`, and `range(2, 2)` is empty. You need `range(2, int(n**0.5) + 1)`."
+  ],
+  "tests": [
+    {
+      "description": "0 is not prime",
+      "input": "is_prime(0)",
+      "expectedOutput": "False"
+    },
+    {
+      "description": "1 is not prime",
+      "input": "is_prime(1)",
+      "expectedOutput": "False"
+    },
+    {
+      "description": "2 is prime",
+      "input": "is_prime(2)",
+      "expectedOutput": "True"
+    },
+    {
+      "description": "3 is prime",
+      "input": "is_prime(3)",
+      "expectedOutput": "True"
+    },
+    {
+      "description": "4 = 2×2, not prime",
+      "input": "is_prime(4)",
+      "expectedOutput": "False"
+    },
+    {
+      "description": "9 = 3×3, not prime",
+      "input": "is_prime(9)",
+      "expectedOutput": "False"
+    },
+    {
+      "description": "17 is prime",
+      "input": "is_prime(17)",
+      "expectedOutput": "True"
+    },
+    {
+      "description": "25 = 5×5, not prime",
+      "input": "is_prime(25)",
+      "expectedOutput": "False"
+    }
+  ],
+  "requirements": {
+    "mustUseLoop": true,
+    "mustContainKeyword": ["return"]
+  }
+}

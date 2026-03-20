@@ -1,0 +1,37 @@
+{
+  "title": "One Too Many",
+  "difficulty": "medium",
+  "tags": ["math", "loops", "counters"],
+  "description": "The function `average(numbers)` computes the mean of a list, and `passing_grade(scores)` uses it to decide if a student passes (average >= 60).\n\nA student with scores `[60, 70, 80]` — average 70 — should clearly **pass**. But the function says `'fail'`.\n\nThe arithmetic logic looks correct. **Where is the counter going wrong?**",
+  "hints": [
+    "Add a `print(count)` at the end of `average` before the return. Call `average([10, 20, 30])`. What does count equal?",
+    "For a list of 3 elements, count should be 3. But it's 4. Why?",
+    "`count` starts at `1`, so after iterating 3 elements it becomes 4. The denominator is one too large. Initialize `count = 0`."
+  ],
+  "tests": [
+    {
+      "description": "clear pass",
+      "input": "passing_grade([60, 70, 80])",
+      "expectedOutput": "pass"
+    },
+    {
+      "description": "exact threshold",
+      "input": "passing_grade([60, 60, 60])",
+      "expectedOutput": "pass"
+    },
+    {
+      "description": "clear fail",
+      "input": "passing_grade([40, 50, 45])",
+      "expectedOutput": "fail"
+    },
+    {
+      "description": "average is accurate",
+      "input": "average([10, 20, 30])",
+      "expectedOutput": "20.0"
+    }
+  ],
+  "requirements": {
+    "mustContainKeyword": ["for"],
+    "mustNotCallBuiltin": ["sum", "len"]
+  }
+}
