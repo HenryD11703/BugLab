@@ -72,21 +72,31 @@ export default function HomePage() {
             </h1>
             <div className="max-w-lg">
               <p
-                className="text-lg text-[#3A3A3A] leading-relaxed mb-1.5"
+                className="text-lg text-[#3A3A3A] leading-relaxed mb-2"
                 style={{ fontFamily: "var(--font-space-grotesk), sans-serif" }}
               >
                 Not another LeetCode.
               </p>
               <p
+                className="text-base text-[#3A3A3A] leading-relaxed mb-2"
+                style={{ fontFamily: "var(--font-space-grotesk), sans-serif" }}
+              >
+                Most platforms ask:{" "}
+                <strong className="text-[#0A0A0A] font-semibold">
+                  can you write it?
+                </strong>{" "}
+                Real work asks:{" "}
+                <strong className="text-[#0A0A0A] font-semibold">
+                  why is this broken?
+                </strong>
+              </p>
+              <p
                 className="text-base text-[#6B6B6B] leading-relaxed"
                 style={{ fontFamily: "var(--font-space-grotesk), sans-serif" }}
               >
-                BugLab challenges your ability to{" "}
-                <strong className="text-[#0A0A0A] font-semibold">write</strong>{" "}
-                and{" "}
-                <strong className="text-[#0A0A0A] font-semibold">review</strong>{" "}
-                code — not just memorize algorithms. Each exercise starts with a
-                broken snippet. You fix it.
+                BugLab builds code-reading and debugging skills — one broken
+                function at a time. Especially relevant as AI tools write more
+                of the code we all maintain.
               </p>
             </div>
 

@@ -77,7 +77,7 @@ const swissEditorTheme = EditorView.theme(
   { dark: true }
 );
 
-// Syntax highlighting — uses @lezer/highlight tags, works correctly with CodeMirror 6
+// Syntax highlighting
 const swissSyntaxHighlight = HighlightStyle.define([
   { tag: tags.keyword,            color: "#E63329", fontWeight: "bold" },
   { tag: tags.controlKeyword,     color: "#E63329", fontWeight: "bold" },
@@ -99,7 +99,6 @@ const swissSyntaxHighlight = HighlightStyle.define([
   { tag: tags.bracket,            color: "#AAAAAA" },
   { tag: tags.squareBracket,      color: "#AAAAAA" },
 
-  // Function & class definitions
   { tag: tags.definition(tags.function(tags.variableName)), color: "#79B8FF", fontWeight: "bold" },
   { tag: tags.definition(tags.variableName), color: "#E8E8E8" },
   { tag: tags.function(tags.variableName),   color: "#79B8FF" },
@@ -121,8 +120,8 @@ const extensions: Extension[] = [
   swissEditorTheme,
   syntaxHighlighting(swissSyntaxHighlight),
   EditorView.lineWrapping,
-  indentUnit.of("    "),                    // 4 spaces — Python standard
-  Prec.highest(keymap.of([indentWithTab])), // Tab = indent, Shift+Tab = dedent
+  indentUnit.of("    "),
+  Prec.highest(keymap.of([indentWithTab])),
 ];
 
 interface CodeEditorProps {
@@ -149,7 +148,7 @@ export default function CodeEditor({ value, onChange, readOnly = false }: CodeEd
           dropCursor: true,
           allowMultipleSelections: false,
           indentOnInput: true,
-          syntaxHighlighting: false, // We handle this manually above
+          syntaxHighlighting: false,
           bracketMatching: true,
           closeBrackets: true,
           autocompletion: false,

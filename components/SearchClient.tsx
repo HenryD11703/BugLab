@@ -262,7 +262,7 @@ export default function SearchClient({ exercises }: SearchClientProps) {
                         </span>
                       ))}
                       <span
-                        className="text-[9px] tracking-[0.1em] uppercase text-[#DDDDDD] ml-auto"
+                        className="text-[9px] tracking-widest uppercase text-[#DDDDDD] ml-auto"
                         style={{ fontFamily: "var(--font-space-mono), monospace" }}
                       >
                         {ex.testCount} test{ex.testCount !== 1 ? "s" : ""}

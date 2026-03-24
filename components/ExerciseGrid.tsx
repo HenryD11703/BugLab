@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Difficulty } from "@/lib/types";
 
@@ -33,6 +33,16 @@ function isWide(index: number) {
 
 export default function ExerciseGrid({ exercises }: ExerciseGridProps) {
   const [difficulty, setDifficulty] = useState<Difficulty | "all">("all");
+  const [completed, setCompleted] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("buglab:completed") ?? "[]";
+      setCompleted(new Set(JSON.parse(raw)));
+    } catch {
+      // localStorage unavailable
+    }
+  }, []);
 
   const filtered = useMemo(
     () =>
@@ -169,12 +179,24 @@ export default function ExerciseGrid({ exercises }: ExerciseGridProps) {
                       </span>
                     ))}
                   </div>
-                  <span
-                    className="text-[9px] tracking-[0.1em] text-[#CCCCCC] shrink-0 group-hover:text-[#AAAAAA] transition-colors"
-                    style={{ fontFamily: "var(--font-space-mono), monospace" }}
-                  >
-                    {ex.testCount}t
-                  </span>
+                  {completed.has(ex.id) ? (
+                    <span
+                      className="text-[9px] tracking-widest uppercase font-bold shrink-0"
+                      style={{
+                        fontFamily: "var(--font-space-mono), monospace",
+                        color: "#6BCB77",
+                      }}
+                    >
+                      ✓ solved
+                    </span>
+                  ) : (
+                    <span
+                      className="text-[9px] tracking-widest text-[#CCCCCC] shrink-0 group-hover:text-[#AAAAAA] transition-colors"
+                      style={{ fontFamily: "var(--font-space-mono), monospace" }}
+                    >
+                      {ex.testCount}t
+                    </span>
+                  )}
                 </div>
               </Link>
             );
