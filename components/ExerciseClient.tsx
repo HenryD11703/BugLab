@@ -2,9 +2,9 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { Exercise, RunResult } from "@/lib/types";
-import { usePyodide } from "@/lib/usePyodide";
+import { usePythonRunner } from "@/lib/usePythonRunner";
 import { markCompleted } from "@/lib/progress";
-import { toLegacyRequirements } from "@/lib/legacy";
+import { describeConstraints } from "@/lib/analysis";
 import dynamic from "next/dynamic";
 import TestResults from "./TestResults";
 import HintsPanel from "./HintsPanel";
@@ -39,19 +39,18 @@ export default function ExerciseClient({ exercise }: ExerciseClientProps) {
   const [result, setResult] = useState<RunResult | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [copied, setCopied] = useState(false);
-  const { status: pyStatus, runExercise } = usePyodide();
+  const { status: pyStatus, message: pyMessage, run, retry } = usePythonRunner();
 
   const handleRun = useCallback(async () => {
-    if (pyStatus !== "ready" || isRunning) return;
+    if (isRunning) return;
     setIsRunning(true);
     setResult(null);
     try {
-      const res = await runExercise(code, exercise);
-      setResult(res);
+      setResult(await run(exercise, code));
     } finally {
       setIsRunning(false);
     }
-  }, [pyStatus, isRunning, code, exercise, runExercise]);
+  }, [isRunning, code, exercise, run]);
 
   const handleReset = () => {
     setCode(exercise.buggyCode);
@@ -121,8 +120,17 @@ export default function ExerciseClient({ exercise }: ExerciseClientProps) {
               : pyStatus === "ready"
               ? "python ready"
               : pyStatus === "error"
-              ? "python error"
+              ? "python unavailable"
               : "initializing"}
+            {pyStatus === "error" && (
+              <button
+                onClick={retry}
+                className="ml-2 underline cursor-pointer hover:text-[#0A0A0A]"
+                title={pyMessage ?? undefined}
+              >
+                retry
+              </button>
+            )}
           </span>
         </div>
       </header>
@@ -168,47 +176,7 @@ export default function ExerciseClient({ exercise }: ExerciseClientProps) {
             {/* Requirements badge */}
             {exercise.fix?.constraints &&
               (() => {
-                const r = toLegacyRequirements(exercise.fix.constraints)!;
-                const items: { label: string; value: string; must: boolean }[] =
-                  [
-                    ...(r.mustContainKeyword ?? []).map((k) => ({
-                      label: "must use keyword",
-                      value: k,
-                      must: true,
-                    })),
-                    ...(r.mustContain ?? []).map((k) => ({
-                      label: "must contain",
-                      value: k,
-                      must: true,
-                    })),
-                    ...(r.mustNotCallBuiltin ?? []).map((k) => ({
-                      label: "must not use built-in",
-                      value: `${k}()`,
-                      must: false,
-                    })),
-                    ...(r.mustNotImport ?? []).map((k) => ({
-                      label: "must not import",
-                      value: k,
-                      must: false,
-                    })),
-                    ...(r.mustNotContain ?? []).map((k) => ({
-                      label: "must not contain",
-                      value: k,
-                      must: false,
-                    })),
-                    ...(r.mustUseLoop
-                      ? [
-                          {
-                            label: "must use a loop",
-                            value: "for / while",
-                            must: true,
-                          },
-                        ]
-                      : []),
-                    ...(r.mustUseRecursion
-                      ? [{ label: "must use recursion", value: "", must: true }]
-                      : []),
-                  ];
+                const items = describeConstraints(exercise.fix.constraints);
                 if (items.length === 0) return null;
                 return (
                   <div className="mt-6 border border-[#DDDDDD] p-4">
@@ -278,18 +246,18 @@ export default function ExerciseClient({ exercise }: ExerciseClientProps) {
               </span>
               <button
                 onClick={handleRun}
-                disabled={pyStatus !== "ready" || isRunning}
+                disabled={isRunning}
                 className={`
                   text-[10px] tracking-[0.12em] uppercase px-4 py-1 font-bold transition-all cursor-pointer
                   ${
-                    pyStatus === "ready" && !isRunning
+                    !isRunning
                       ? "bg-[#E63329] text-white hover:bg-[#CC2A22]"
                       : "bg-[#333333] text-[#666666] cursor-not-allowed"
                   }
                 `}
                 style={{ fontFamily: "var(--font-space-mono), monospace" }}
               >
-                {isRunning ? "Running..." : "Run →"}
+                {isRunning ? (pyStatus === "loading" ? "Loading Python..." : "Running...") : "Run →"}
               </button>
             </div>
           </div>

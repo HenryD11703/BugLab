@@ -37,5 +37,12 @@ export interface RunResult {
   results: TestResult[];
   requirementErrors: string[];
   output: string;
+  /** Traceback or message when the code could not run to the tests. */
   error?: string;
+  /** 1-indexed line of the learner's code the error points at. */
+  errorLine?: number;
+  /** The run was stopped after the time limit. */
+  timedOut?: boolean;
+  /** The Python runtime could not be loaded (offline, blocked). */
+  unavailable?: boolean;
 }
