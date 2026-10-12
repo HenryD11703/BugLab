@@ -1,35 +1,44 @@
 import { useSyncExternalStore } from "react";
+import {
+  EMPTY_EXERCISE,
+  EMPTY_PROGRESS,
+  LEGACY_KEY,
+  STORAGE_KEY,
+  applyAction,
+  parseProgress,
+  solvedIds,
+  type ExerciseProgress,
+  type ProgressAction,
+  type ProgressData,
+  type Step,
+} from "./progress-model";
 
-const KEY = "buglab:completed";
-const EMPTY: readonly string[] = [];
+export type { ExerciseProgress, Step } from "./progress-model";
+
 const UNREAD = Symbol("unread");
-
 const listeners = new Set<() => void>();
-let cache: { raw: string | null | typeof UNREAD; value: readonly string[] } = {
+let cache: { raw: string | null | typeof UNREAD; legacy: string | null; value: ProgressData } = {
   raw: UNREAD,
-  value: EMPTY,
+  legacy: null,
+  value: EMPTY_PROGRESS,
 };
 
-function parse(raw: string | null): readonly string[] {
-  if (!raw) return EMPTY;
+function readStorage(key: string): string | null {
   try {
-    const data: unknown = JSON.parse(raw);
-    return Array.isArray(data) ? data.filter((x): x is string => typeof x === "string") : EMPTY;
+    return localStorage.getItem(key);
   } catch {
-    return EMPTY;
+    return null; // blocked or unavailable: behave as if nothing was saved
   }
 }
 
 // useSyncExternalStore needs a referentially stable snapshot, so the parsed
-// array is cached until the raw string in localStorage actually changes.
-function getSnapshot(): readonly string[] {
-  let raw: string | null;
-  try {
-    raw = localStorage.getItem(KEY);
-  } catch {
-    return EMPTY;
+// data is cached until the raw strings in localStorage actually change.
+function getSnapshot(): ProgressData {
+  const raw = readStorage(STORAGE_KEY);
+  const legacy = readStorage(LEGACY_KEY);
+  if (raw !== cache.raw || legacy !== cache.legacy) {
+    cache = { raw, legacy, value: parseProgress(raw, legacy) };
   }
-  if (raw !== cache.raw) cache = { raw, value: parse(raw) };
   return cache.value;
 }
 
@@ -42,18 +51,53 @@ function subscribe(onChange: () => void) {
   };
 }
 
-export function markCompleted(id: string) {
+function dispatch(action: ProgressAction) {
   const current = getSnapshot();
-  if (current.includes(id)) return;
+  const next = applyAction(current, action);
+  if (next === current) return;
   try {
-    localStorage.setItem(KEY, JSON.stringify([...current, id]));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   } catch {
-    // localStorage unavailable (private mode, blocked): progress is not saved
+    // storage full or blocked: progress is not saved, the page keeps working
     return;
   }
   listeners.forEach((l) => l());
 }
 
+export const saveCode = (id: string, code: string | undefined) => dispatch({ type: "saveCode", id, code });
+export const completeStep = (id: string, step: Step) => dispatch({ type: "completeStep", id, step });
+export const setHintsOpened = (id: string, count: number) => dispatch({ type: "setHintsOpened", id, count });
+
+/** Progress of one exercise. Before hydration (and on the server) it is empty. */
+export function useExerciseProgress(id: string): ExerciseProgress {
+  return useSyncExternalStore(
+    subscribe,
+    () => getSnapshot().exercises[id] ?? EMPTY_EXERCISE,
+    () => EMPTY_EXERCISE
+  );
+}
+
+const NO_IDS: readonly string[] = [];
+let idsCache: { source: ProgressData; ids: readonly string[] } = { source: EMPTY_PROGRESS, ids: NO_IDS };
+
+/** Ids of exercises whose Fix step is solved. */
 export function useCompleted(): readonly string[] {
-  return useSyncExternalStore(subscribe, getSnapshot, () => EMPTY);
+  return useSyncExternalStore(
+    subscribe,
+    () => {
+      const data = getSnapshot();
+      if (idsCache.source !== data) idsCache = { source: data, ids: solvedIds(data) };
+      return idsCache.ids;
+    },
+    () => NO_IDS
+  );
+}
+
+/** False on the server and during hydration, true afterwards. */
+export function useHydrated(): boolean {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 }

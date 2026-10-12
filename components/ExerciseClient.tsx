@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { Exercise, RunResult } from "@/lib/types";
 import { usePythonRunner } from "@/lib/usePythonRunner";
-import { markCompleted } from "@/lib/progress";
+import { completeStep, saveCode, useExerciseProgress, useHydrated } from "@/lib/progress";
 import { describeConstraints } from "@/lib/analysis";
 import dynamic from "next/dynamic";
 import TestResults from "./TestResults";
@@ -35,7 +35,19 @@ interface ExerciseClientProps {
 }
 
 export default function ExerciseClient({ exercise }: ExerciseClientProps) {
-  const [code, setCode] = useState(exercise.buggyCode);
+  const progress = useExerciseProgress(exercise.id);
+  const hydrated = useHydrated();
+  // The saved draft is only known after hydration; until the learner edits,
+  // the editor shows it. Once they edit, their own text wins.
+  const [edited, setEdited] = useState<string | null>(null);
+  const code = edited ?? (hydrated ? progress.code ?? exercise.buggyCode : exercise.buggyCode);
+  const setCode = useCallback(
+    (next: string) => {
+      setEdited(next);
+      saveCode(exercise.id, next === exercise.buggyCode ? undefined : next);
+    },
+    [exercise.id, exercise.buggyCode]
+  );
   const [result, setResult] = useState<RunResult | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -78,7 +90,7 @@ export default function ExerciseClient({ exercise }: ExerciseClientProps) {
 
   // Save to localStorage when all tests pass
   useEffect(() => {
-    if (result?.status === "passed") markCompleted(exercise.id);
+    if (result?.status === "passed") completeStep(exercise.id, "fix");
   }, [result, exercise.id]);
 
   return (
