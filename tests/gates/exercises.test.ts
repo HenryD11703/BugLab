@@ -104,6 +104,13 @@ describe("the gates catch broken exercises", () => {
     expect(problems.join("\n")).toMatch(/line 2 is blank/);
   });
 
+  it("rejects a solution that breaks the exercise's own constraints", () => {
+    const problems = checkExercise(
+      build({}, { fix: { tests, constraints: { mustUseLoop: true } } })
+    );
+    expect(problems.join("\n")).toMatch(/solution\.py breaks a constraint: Must use a loop/);
+  });
+
   it("requires at least one wrong fix", () => {
     const dir = build({});
     fs.rmSync(path.join(dir, "wrong-fixes"), { recursive: true });

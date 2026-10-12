@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { checkConstraints } from "@/lib/analysis";
 import { exerciseSchema } from "@/lib/schema";
 
 const HARNESS = path.join(__dirname, "harness.py");
@@ -59,6 +60,15 @@ export function checkExercise(dir: string): string[] {
   const ex = parsed.data;
   const buggy = read(path.join(dir, "buggy.py"));
   const solution = read(path.join(dir, "solution.py"));
+
+  // the reference solution must obey the exercise's own constraints
+  if (ex.fix?.constraints) {
+    const analysis = checkConstraints(solution, ex.fix.constraints);
+    if (analysis.syntaxError) problems.push("solution.py has a syntax error");
+    for (const v of analysis.violations) {
+      problems.push(`solution.py breaks a constraint: ${v.message}`);
+    }
+  }
 
   // locate: lines must exist and point at real code
   const lines = buggy.replace(/\n$/, "").split("\n");
