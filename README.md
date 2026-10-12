@@ -25,7 +25,7 @@ That's a different skill — and arguably a more important one. In real work, yo
 
 | Layer | Technology |
 |---|---|
-| Framework | Next.js 15 (App Router, static export) |
+| Framework | Next.js 16 (App Router, statically generated pages) |
 | Language | TypeScript |
 | Styling | Tailwind CSS v4 |
 | Code editor | CodeMirror 6 |
@@ -82,7 +82,7 @@ Exercises are just files. To add one, create a folder in `exercises/`:
 
 ```
 exercises/
-  008-your-exercise-name/
+  021-your-exercise-name/
     buggy.py        ← the broken code (what the user sees)
     solution.py     ← the fixed version (never shown to users)
     exercise.json   ← metadata, hints, and test cases
@@ -102,47 +102,14 @@ See **[exercises/README.md](exercises/README.md)** for the full schema, field re
 
 ## Roadmap
 
-Milestones are ordered by scope and complexity, not by date. No fake deadlines.
+BugLab is being rebuilt to teach **reading** code and spotting errors, not only fixing it. The plan lives in [`docs/`](docs/):
 
-### v0.2 — Polish & content
-> Zero new architecture. Can be done today.
+- [`00-principles.md`](docs/00-principles.md): rules that every decision must respect
+- [`01-spec.md`](docs/01-spec.md): what we are building and the acceptance criteria
+- [`02-plan.md`](docs/02-plan.md): technical decisions and rejected alternatives
+- [`03-tasks.md`](docs/03-tasks.md): ordered tasks with their checks
 
-- **`Ctrl+Enter` to run** — keyboard shortcut in the editor so you never have to reach for the mouse
-- **20+ exercises** — more Python gotchas: generator exhaustion, `is` vs `==`, float equality, dict key mutation, `*args` unpacking bugs
-- **Proper Markdown rendering** — fenced code blocks, lists, italic in exercise descriptions (currently pseudo-markdown)
-- **Share button** — the URL already identifies the exercise uniquely; just needs a one-click copy
-- **Completion indicators** — `localStorage` marks exercises as solved; home page shows a check next to completed ones
-
-### v0.3 — Multi-language
-> Python via Pyodide is proven. JavaScript runs natively in the browser — no WASM needed.
-
-- **JavaScript exercises** — same `exercise.json` schema, `buggy.js` / `solution.js`, sandboxed execution via Web Worker
-- **Language filter** — extend the existing client-side filter on the home page
-- Zero-backend constraint stays intact
-
-### v0.4 — Community tooling
-> Lower the friction for open source contributions.
-
-- **`buglab validate` CLI** — run locally before opening a PR; checks schema validity, verifies that `buggy.py` fails the tests and `solution.py` passes them
-- **GitHub PR template** — structured exercise submission checklist
-- **Difficulty feedback** — users can flag if a difficulty label feels wrong (lightweight, file-based)
-
-### v1.0 — Tracks
-> Structured learning paths. New data model, still no backend.
-
-- **`tracks/` folder** — a `track.json` lists exercise IDs in a curated order with a theme: "Python gotchas", "Loop pitfalls", "Scope & closures"
-- **Track pages** — `/track/[id]` shows the sequence, descriptions, and progress
-- **"Next exercise" navigation** — move through a track without going back to the home page
-- **Track progress in `localStorage`** — no account needed
-
-### Open ideas
-Not committed, but worth capturing:
-
-- **"Write the bug" mode** — reverse mode: given working code, introduce a bug that makes specific tests fail
-- **VS Code extension** — solve exercises without leaving your editor
-- **Classroom mode** — a teacher shares a link to a curated set; students work through it (requires a light backend)
-- **Contextual AI hints** — opt-in: given the user's current code and the solution, generate a targeted hint via the Anthropic API
-- **More languages** — Go, Rust, TypeScript (each needs a WASM runtime or a sandboxed eval strategy)
+Until that lands, the text below describes the current state.
 
 ---
 
