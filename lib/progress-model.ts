@@ -122,6 +122,20 @@ export function applyAction(state: ProgressData, action: ProgressAction): Progre
 
 export const isSolved = (p: ExerciseProgress | undefined): boolean => p?.done.fix === true;
 
+/**
+ * An exercise is complete when its Fix step is solved, or, if it has no Fix
+ * step, when every step it declares is done.
+ */
+export function isComplete(p: ExerciseProgress | undefined, declared: readonly Step[]): boolean {
+  if (!p || declared.length === 0) return false;
+  return declared.includes("fix") ? p.done.fix === true : declared.every((s) => p.done[s] === true);
+}
+
+/** True when the learner has done anything at all in this exercise. */
+export function isStarted(p: ExerciseProgress | undefined): boolean {
+  return Boolean(p && (p.code !== undefined || p.hintsOpened > 0 || Object.keys(p.done).length > 0));
+}
+
 export function solvedIds(state: ProgressData): string[] {
   return Object.entries(state.exercises)
     .filter(([, p]) => isSolved(p))

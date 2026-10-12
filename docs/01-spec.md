@@ -57,4 +57,5 @@ Accounts, leaderboards, a server, running code on a server, languages other than
 - **Flow:** steps are shown in a guided order, but any step can be opened or skipped at any time. Nobody gets stuck.
 - **Solution:** a "Show solution" button appears once the learner has opened all hints or has solved the exercise. The solution is public in the repo anyway, so we do not try to hide it.
 - **Theme:** dark only. Light mode is left for later.
+- **Design (approved 2026-10-12 from the mockups in `docs/design/mockups/`):** the Python-traceback direction. IBM Plex Sans + Mono, one accent (coral, the caret under the bug), green for solved, amber for hints. On phones the exercise page has two tabs, *Read | Work* (editor and results together). The home list hides the name of each bug until the exercise is solved, and progress is shown as pytest-style dots.
 - Product direction: *read and fix*. Engine: *hybrid* (Pyodide in a Web Worker for Fix; a parser for constraints and reading steps). Visual direction: *Python traceback / terminal*, explored with mockups before implementation. Audience: Python beginners.

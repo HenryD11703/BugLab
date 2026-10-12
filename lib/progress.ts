@@ -6,7 +6,6 @@ import {
   STORAGE_KEY,
   applyAction,
   parseProgress,
-  solvedIds,
   type ExerciseProgress,
   type ProgressAction,
   type ProgressData,
@@ -77,20 +76,9 @@ export function useExerciseProgress(id: string): ExerciseProgress {
   );
 }
 
-const NO_IDS: readonly string[] = [];
-let idsCache: { source: ProgressData; ids: readonly string[] } = { source: EMPTY_PROGRESS, ids: NO_IDS };
-
-/** Ids of exercises whose Fix step is solved. */
-export function useCompleted(): readonly string[] {
-  return useSyncExternalStore(
-    subscribe,
-    () => {
-      const data = getSnapshot();
-      if (idsCache.source !== data) idsCache = { source: data, ids: solvedIds(data) };
-      return idsCache.ids;
-    },
-    () => NO_IDS
-  );
+/** All progress, for the home list. Empty on the server and during hydration. */
+export function useProgressData(): ProgressData {
+  return useSyncExternalStore(subscribe, getSnapshot, () => EMPTY_PROGRESS);
 }
 
 /** False on the server and during hydration, true afterwards. */

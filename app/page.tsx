@@ -1,169 +1,58 @@
-import Link from "next/link";
+import CodeBlock from "@/components/CodeBlock";
+import ExerciseTable, { type ExerciseRow } from "@/components/home/ExerciseTable";
+import SiteHeader from "@/components/SiteHeader";
 import { getAllExercises } from "@/lib/exercises";
-import ExerciseGrid from "@/components/ExerciseGrid";
+import { STEPS } from "@/lib/progress-model";
+
+const SAMPLE = `def sum_list(numbers):
+    total = 0
+    for i in range(len(numbers) - 1):
+        total += numbers[i]
+    return total
+`;
 
 export default function HomePage() {
-  const exercises = getAllExercises();
-
-  const exerciseItems = exercises.map((ex) => ({
-    id: ex.id,
-    title: ex.title,
-    difficulty: ex.difficulty,
-    tags: ex.tags,
-    description: ex.description,
-    testCount: ex.fix?.tests.length ?? 0,
+  const rows: ExerciseRow[] = getAllExercises().map((e) => ({
+    id: e.id,
+    title: e.title,
+    difficulty: e.difficulty,
+    tags: e.tags.slice(0, 2),
+    concept: e.concept,
+    steps: STEPS.filter((s) => e[s]),
   }));
 
-  const counts = {
-    total: exercises.length,
-    easy: exercises.filter((e) => e.difficulty === "easy").length,
-    medium: exercises.filter((e) => e.difficulty === "medium").length,
-    hard: exercises.filter((e) => e.difficulty === "hard").length,
-  };
-
   return (
-    <div className="min-h-screen bg-[#FAFAFA]">
-      {/* Hero */}
-      <div className="border-b border-[#0A0A0A]">
-        <div className="max-w-5xl mx-auto px-8">
-          {/* Nav */}
-          <nav className="flex items-center justify-between h-12 border-b border-[#E0E0E0]">
-            <span
-              className="text-[10px] tracking-[0.2em] uppercase text-[#0A0A0A] font-bold"
-              style={{ fontFamily: "var(--font-space-mono), monospace" }}
-            >
-              BugLab
-            </span>
-            <div className="flex items-center gap-5">
-              <Link
-                href="/search"
-                className="text-[10px] tracking-[0.15em] uppercase text-[#6B6B6B] hover:text-[#0A0A0A] transition-colors"
-                style={{ fontFamily: "var(--font-space-mono), monospace" }}
-              >
-                Search
-              </Link>
-              <a
-                href="https://github.com/HenryD11703/BugLab"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[10px] tracking-[0.15em] uppercase text-[#6B6B6B] hover:text-[#E63329] transition-colors"
-                style={{ fontFamily: "var(--font-space-mono), monospace" }}
-              >
-                GitHub ↗
-              </a>
-            </div>
-          </nav>
-
-          {/* Hero content */}
-          <div className="py-14 pb-12">
-            <div className="mb-4">
-              <span
-                className="text-[10px] tracking-[0.2em] uppercase text-[#E63329]"
-                style={{ fontFamily: "var(--font-space-mono), monospace" }}
-              >
-                Open Source
-              </span>
-            </div>
-            <h1
-              className="text-[clamp(3rem,8vw,6.5rem)] font-bold leading-[0.9] tracking-[-0.04em] text-[#0A0A0A] mb-5"
-              style={{ fontFamily: "var(--font-space-grotesk), sans-serif" }}
-            >
-              Bug<span className="text-[#E63329]">Lab</span>
-            </h1>
-            <div className="max-w-lg">
-              <p
-                className="text-lg text-[#3A3A3A] leading-relaxed mb-2"
-                style={{ fontFamily: "var(--font-space-grotesk), sans-serif" }}
-              >
-                Not another LeetCode.
-              </p>
-              <p
-                className="text-base text-[#3A3A3A] leading-relaxed mb-2"
-                style={{ fontFamily: "var(--font-space-grotesk), sans-serif" }}
-              >
-                Most platforms ask:{" "}
-                <strong className="text-[#0A0A0A] font-semibold">
-                  can you write it?
-                </strong>{" "}
-                Real work asks:{" "}
-                <strong className="text-[#0A0A0A] font-semibold">
-                  why is this broken?
-                </strong>
-              </p>
-              <p
-                className="text-base text-[#6B6B6B] leading-relaxed"
-                style={{ fontFamily: "var(--font-space-grotesk), sans-serif" }}
-              >
-                BugLab builds code-reading and debugging skills — one broken
-                function at a time. Especially relevant as AI tools write more
-                of the code we all maintain.
+    <>
+      <SiteHeader />
+      <main>
+        <section className="hero">
+          <div className="wrap grid">
+            <div>
+              <h1>
+                Read the code.
+                <br />
+                Find the <span className="bugword">bug</span>.
+              </h1>
+              <p className="lede">
+                Short, broken Python functions. <strong>Predict</strong> what they do, <strong>point</strong> at the bug,{" "}
+                <strong>explain</strong> it, then <strong>fix</strong> it. Runs in your browser. No account.
               </p>
             </div>
-
-            {/* Stats bar */}
-            <div className="flex items-center gap-8 mt-8 pt-7 border-t border-[#E0E0E0]">
-              {[
-                { label: "Exercises", value: counts.total },
-                { label: "Easy", value: counts.easy },
-                { label: "Medium", value: counts.medium },
-                { label: "Hard", value: counts.hard },
-              ].map(({ label, value }) => (
-                <div key={label}>
-                  <div
-                    className="text-2xl font-bold text-[#0A0A0A] tracking-[-0.02em]"
-                    style={{
-                      fontFamily: "var(--font-space-grotesk), sans-serif",
-                    }}
-                  >
-                    {value}
-                  </div>
-                  <div
-                    className="text-[10px] tracking-[0.15em] uppercase text-[#6B6B6B]"
-                    style={{ fontFamily: "var(--font-space-mono), monospace" }}
-                  >
-                    {label}
-                  </div>
-                </div>
-              ))}
+            <div className="pointer">
+              <span className="label">The kind of thing you will find</span>
+              <CodeBlock code={SAMPLE} label="Example: a function with a bug on line 3" bug={[3]} pointAt={[{ line: 3, from: 19, to: 35 }]} />
+              <p className="pointer-cap">sum_list([1, 2, 3]) returns 3. Why?</p>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Exercise grid */}
-      <div className="max-w-5xl mx-auto px-8 py-10">
-        {exercises.length === 0 ? (
-          <div className="text-center py-20">
-            <p
-              className="text-[#CCCCCC] text-sm tracking-widest uppercase"
-              style={{ fontFamily: "var(--font-space-mono), monospace" }}
-            >
-              No exercises yet. Add one to{" "}
-              <code className="bg-[#F0F0F0] px-1">exercises/</code>
-            </p>
-          </div>
-        ) : (
-          <ExerciseGrid exercises={exerciseItems} />
-        )}
-      </div>
-
-      {/* Footer */}
-      <footer className="border-t border-[#E0E0E0] mt-10">
-        <div className="max-w-5xl mx-auto px-8 py-6 flex items-center justify-between">
-          <span
-            className="text-[10px] tracking-[0.15em] uppercase text-[#CCCCCC]"
-            style={{ fontFamily: "var(--font-space-mono), monospace" }}
-          >
-            BugLab — Open Source
-          </span>
-          <span
-            className="text-[10px] tracking-[0.15em] uppercase text-[#CCCCCC]"
-            style={{ fontFamily: "var(--font-space-mono), monospace" }}
-          >
-            Python runs in your browser via Pyodide
-          </span>
+        </section>
+        <ExerciseTable rows={rows} />
+      </main>
+      <footer className="site">
+        <div className="wrap">
+          <span>BugLab · open source · MIT</span>
+          <span>Python runs in your browser. Nothing leaves it.</span>
         </div>
       </footer>
-    </div>
+    </>
   );
 }

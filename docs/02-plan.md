@@ -54,10 +54,14 @@ Progress and the last code per exercise live in `localStorage` under a versioned
 ## Interface
 - Exercise page is a guided sequence: Predict, Locate, Explain, Fix. The order is a suggestion; every step can be opened or skipped at any time (AC-17). "Show solution" unlocks after all hints are opened or after solving (AC-18).
 - Dark theme only for v1.
-- Below 768 px the exercise page switches from two columns to tabs (*Read | Code | Results*), so the editor gets the full width (AC-07).
+- Below 900 px the exercise page switches from two columns to two tabs (*Read | Work*), so the editor gets the full width and the results stay under it (AC-07). Approved in the design gate.
 - Everything is operable with the keyboard; focus order and `aria-live` for results are tested (AC-08, AC-09).
 - **Design**: Python traceback / terminal direction. Errors are shown as real-looking tracebacks with `^^^^` markers, code is the hero, line numbers are part of the layout. Two mockups (home and exercise, desktop and phone) are approved before any component is built (AC-13).
-- Exercise description rendering: replace the home-made `markdownToHtml` + `dangerouslySetInnerHTML` with a small, tested Markdown renderer that escapes HTML by default.
+- Exercise description rendering: replace the home-made `markdownToHtml` + `dangerouslySetInnerHTML` with a small, tested Markdown parser that renders React elements (no raw HTML at all).
+- Read-only code (Predict, Locate, hero) is highlighted with `@lezer/highlight` on the same Lezer grammar; the editor is CodeMirror with a matching theme.
+- `Show solution` loads the solution from a static JSON file (`/solutions/<id>`) only when unlocked, so it is not in the page payload. It is public in the repo anyway; the gate is pedagogical.
+- The `/search` page is folded into the home list as a text filter; one page less to keep consistent.
+- Static export (`output: "export"`) is switched on with the new pages.
 
 ## Quality gates (CI)
 Run on every push and pull request, on Python 3.12 to match Pyodide:
