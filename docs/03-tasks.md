@@ -1,6 +1,6 @@
-# BugLab tasks (v0 draft)
+# BugLab tasks
 
-Status: **approved 2026-10-12. P0 and P1 done; P2 next (T20 is a design gate).** Order matters. A task is done only when its check passes. Estimates are honest working hours, not calendar time.
+Status: **approved 2026-10-12. P0, P1 and P2 done except T27 (publish, needs the owner's OK).** Order matters. A task is done only when its check passes. Estimates are honest working hours, not calendar time.
 
 ## P0 — broken things (about 2-3 h)
 | ID | Task | Done when | AC |
@@ -23,13 +23,13 @@ Status: **approved 2026-10-12. P0 and P1 done; P2 next (T20 is a design gate).**
 ## P2 — product (about 10-12 h)
 | ID | Task | Done when | AC |
 |---|---|---|---|
-| T20 | **Design gate:** two mockups (home, exercise; desktop and phone) in the traceback direction | owner approves | 13 |
-| T21 | Design tokens, typography, base components (code block, traceback, step header, buttons) | visual review in the browser | 13 |
-| T22 | Exercise page: Predict, Locate, Explain, Fix as a guided sequence with free navigation; "Show solution" gate; safe Markdown renderer; explanation after solve | E2E full flow per step, skip any step, solution locked until hints are opened | 07, 08, 17, 18 |
-| T23 | Mobile layout: tabs below 768 px | E2E at 375 px: no horizontal scroll, editor usable | 07 |
-| T24 | Home and search redesigned; progress shown | visual review; axe | 09, 12 |
-| T25 | E2E + axe suite complete (desktop and phone), keyboard-only flow | all green in CI | 08, 09 |
-| T26 | `README.md`, `CONTRIBUTING.md`, `docs/ARCHITECTURE.md` in English | reviewed | 15 |
+| T20 ✅ | **Design gate:** two mockups (home, exercise; desktop and phone) in the traceback direction | owner approves | 13 |
+| T21 ✅ | Design tokens, typography, base components (code block, traceback, step header, buttons) | visual review in the browser | 13 |
+| T22 ✅ | Exercise page: Predict, Locate, Explain, Fix as a guided sequence with free navigation; "Show solution" gate; safe Markdown renderer; explanation after solve | E2E full flow per step, skip any step, solution locked until hints are opened | 07, 08, 17, 18 |
+| T23 ✅ | Mobile layout: tabs below 768 px | E2E at 375 px: no horizontal scroll, editor usable | 07 |
+| T24 ✅ | Home and search redesigned; progress shown | visual review; axe | 09, 12 |
+| T25 ✅ | E2E + axe suite complete (desktop and phone), keyboard-only flow | all green in CI | 08, 09 |
+| T26 ✅ | `README.md`, `CONTRIBUTING.md`, `docs/ARCHITECTURE.md` in English | reviewed | 15 |
 | T27 | **Publish gate:** branch push, PR, merge, tag `v1.0.0`, Vercel variables (none needed) | owner confirms each public action | all |
 
 ## Dependencies
@@ -39,3 +39,25 @@ T01-T04 are independent. T11 needs T10. T12 needs T11. T14 needs T10. T22 needs 
 1. Spec + plan + tasks (now).
 2. T20 design mockups.
 3. T27 any push, PR or tag.
+
+## Acceptance criteria and what proves each one
+| AC | Proven by |
+|---|---|
+| 01 infinite loop stopped, page alive | `tests/e2e/runner.spec.ts` "stops an infinite loop..." |
+| 02 clean namespace per run | `runner.spec.ts` "a function from an earlier run cannot satisfy a later one" |
+| 03 buggy fails, solution passes | `tests/gates` (CPython) and `tests/e2e/pyodide-gates.spec.ts` (Pyodide 3.12) |
+| 04 wrong fixes fail | the same two |
+| 05 predict answers are true | the same two (error-name answers in the CPython gate only) |
+| 06 rules checked by parsing | `tests/unit/analysis.test.ts`, `runExercise.test.ts` (Python is not called) |
+| 07 phone, 375 px | `tests/e2e/layout.spec.ts` |
+| 08 keyboard only | `tests/e2e/keyboard.spec.ts` |
+| 09 axe, no serious or critical | `tests/e2e/a11y.spec.ts`, desktop and phone, every step and state |
+| 10 runtime not downloaded by home or reading steps | `runner.spec.ts` "loads the home page and the reading steps without downloading..." |
+| 11 clear message offline, reading steps work | `runner.spec.ts` "keeps working with a clear message..." |
+| 12 progress survives reload | `tests/unit/progress.test.ts`, `tests/e2e/progress.spec.ts` |
+| 13 design (manual) | mockups approved in the design gate; reviewed in the browser on desktop and phone |
+| 14 20 exercises, fixed, with step data | schema + gates over all 20; 002, 010, 020 text fixed |
+| 15 adding an exercise is easy (manual) | `CONTRIBUTING.md`, `exercises/README.md` |
+| 16 audit 0, tsc, eslint, build | CI (`npm run lint`, `typecheck`, `test`, `audit --omit=dev`) and a clean `next build` |
+| 17 steps open or skipped any time | `tests/e2e/flow.spec.ts` "any step can be skipped or opened at any time" |
+| 18 solution locked until hints are open | `flow.spec.ts` "the solution stays locked..." (also checks it is not in the page) |

@@ -5,7 +5,7 @@ Status: **DRAFT.** How we meet `01-spec.md` under `00-principles.md`. Each decis
 ## Stack
 Keep Next.js (upgraded to a patched version), React 19, TypeScript, Tailwind 4 and CodeMirror 6. Add Vitest, Playwright + axe, and a GitHub Actions workflow. Rejected: switching framework. Nothing in the spec needs it.
 
-**Static export** (`output: "export"`). BugLab has no backend (principle 2), so the site is plain files that deploy anywhere. Rejected: server rendering. It would add attack surface and cost for no benefit.
+**Every page is generated at build time, and there is no server code** (no API routes, no server actions; principle 2). Rejected: `output: "export"`. It adds nothing here, and `next start` (used by the end-to-end tests) does not serve an export. Rejected: server rendering: attack surface and cost for no benefit.
 
 ## Exercise format (v2)
 One folder per exercise, validated at build time by a strict schema. Invalid content fails the build with the file and the reason.
@@ -61,7 +61,7 @@ Progress and the last code per exercise live in `localStorage` under a versioned
 - Read-only code (Predict, Locate, hero) is highlighted with `@lezer/highlight` on the same Lezer grammar; the editor is CodeMirror with a matching theme.
 - `Show solution` loads the solution from a static JSON file (`/solutions/<id>`) only when unlocked, so it is not in the page payload. It is public in the repo anyway; the gate is pedagogical.
 - The `/search` page is folded into the home list as a text filter; one page less to keep consistent.
-- Static export (`output: "export"`) is switched on with the new pages.
+- Pages stay statically generated; a test of the build output is not needed because there is no server code to run.
 
 ## Quality gates (CI)
 Run on every push and pull request, on Python 3.12 to match Pyodide:
