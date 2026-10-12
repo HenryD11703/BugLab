@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BugLab home mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+  .hero { padding: 72px 0 56px; border-bottom: 1px solid var(--rule); }
+  .hero .grid { display: grid; grid-template-columns: 7fr 5fr; gap: 56px; align-items: end; }
+  h1 { margin: 0 0 24px; font: 600 clamp(44px, 7.4vw, 88px)/0.98 var(--sans); letter-spacing: -0.035em; }
+  h1 .bugword { position: relative; display: inline-block; }
+  h1 .bugword::after { content: "^^^"; position: absolute; left: 0.02em; bottom: -0.62em; font: 600 0.24em/1 var(--mono); letter-spacing: 0.04em; color: var(--caret); }
+  .lede { max-width: 46ch; margin: 0; color: var(--dim); font-size: 17px; line-height: 1.55; }
+  .lede strong { color: var(--text); font-weight: 500; }
+  .hero .grid > * { min-width: 0; }
+  .pointer { padding-bottom: 6px; }
+  .pointer .label { display: block; margin-bottom: 12px; }
+  .pointer-cap { margin-top: 10px; font: 400 12px/1.5 var(--mono); color: var(--dim); }
+
+  .progress { display: flex; align-items: center; gap: 18px; padding: 22px 0; border-bottom: 1px solid var(--rule); }
+  .dots { font: 500 16px/1 var(--mono); letter-spacing: 0.2em; color: var(--rule-strong); overflow: hidden; white-space: nowrap; }
+  .dots .ok { color: var(--pass); }
+  .count { margin-left: auto; font: 500 12px/1 var(--mono); color: var(--dim); white-space: nowrap; }
+  .count b { color: var(--text); font-weight: 600; }
+
+  .filters { display: flex; gap: 22px; padding: 18px 0; font: 500 12px/1 var(--mono); }
+  .filters button { color: var(--faint); padding: 6px 0; border-bottom: 1px solid transparent; }
+  .filters button:hover { color: var(--text); }
+  .filters button[aria-pressed="true"] { color: var(--text); border-bottom-color: var(--caret); }
+
+  .list { border-top: 1px solid var(--rule-strong); }
+  .row { display: grid; grid-template-columns: 56px minmax(0, 3.2fr) minmax(0, 2.4fr) 92px 88px 104px; align-items: center; gap: 16px; min-height: 62px; padding: 10px 0; border-bottom: 1px solid var(--rule); position: relative; }
+  .row:hover { background: var(--panel); }
+  .row:hover::before { content: ">"; position: absolute; left: -16px; color: var(--caret); font: 600 14px/1 var(--mono); }
+  .row .num { font: 500 13px/1 var(--mono); color: var(--faint); }
+  .row .title { font: 500 17px/1.25 var(--sans); }
+  .row .tags { margin-top: 6px; }
+  .row .concept { font: 500 12px/1.4 var(--mono); }
+  .row .concept.hidden { color: var(--faint); }
+  .row .concept.found { color: var(--pass); }
+  .row .state { font: 500 12px/1 var(--mono); text-align: right; }
+  .row .state.solved { color: var(--pass); }
+  .row .state.open { color: var(--faint); }
+  .list-head { display: grid; grid-template-columns: 56px minmax(0, 3.2fr) minmax(0, 2.4fr) 92px 88px 104px; gap: 16px; padding: 12px 0; }
+  .list-head .label:last-child { text-align: right; }
+
+  footer { margin-top: 72px; padding: 28px 0 56px; border-top: 1px solid var(--rule); }
+  footer .wrap { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; font: 400 12px/1.6 var(--mono); color: var(--faint); }
+
+  @media (max-width: 900px) {
+    .hero { padding: 44px 0 40px; }
+    .hero .grid { grid-template-columns: 1fr; gap: 40px; }
+    .row, .list-head { grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; }
+    .row .concept, .row .steps, .list-head .label:nth-child(n+3):not(:last-child) { display: none; }
+    .list-head .label:nth-child(4), .list-head .label:nth-child(5) { display: none; }
+    .row .diffcell { grid-column: 2; grid-row: 2; }
+    .row .state { grid-column: 3; grid-row: 1; }
+    .row .mini { display: flex; gap: 14px; align-items: center; grid-column: 2 / 4; grid-row: 2; margin-top: 2px; }
+    .row { align-items: start; row-gap: 4px; }
+    .row:hover::before { display: none; }
+    .progress { flex-wrap: wrap; gap: 10px; }
+    .count { margin-left: 0; }
+  }
+  @media (min-width: 901px) { .row .mini { display: contents; } }
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <a class="wordmark" href="#">BugLab</a>
+  <nav class="nav"><a href="#list">exercises</a><a href="exercise.html">example</a><a href="#">github ↗</a></nav>
+</div></header>
+
+<main>
+  <section class="hero"><div class="wrap grid">
+    <div>
+      <h1>Read the code.<br>Find the <span class="bugword">bug</span>.</h1>
+      <p class="lede">Short, broken Python functions. <strong>Predict</strong> what they do, <strong>point</strong> at the bug, <strong>explain</strong> it, then <strong>fix</strong> it. Runs in your browser. No account.</p>
+    </div>
+    <div class="pointer">
+      <span class="label">The kind of thing you will find</span>
+      <pre class="code"><div class="l"><span class="n">1</span><span class="t"><span class="k">def</span> <span class="f">sum_list</span>(numbers):</span></div><div class="l"><span class="n">2</span><span class="t">    total = <span class="m">0</span></span></div><div class="l bug"><span class="n">3</span><span class="t">    <span class="k">for</span> i <span class="k">in</span> <span class="f">range</span>(<span class="f">len</span>(numbers) - <span class="m">1</span>):</span></div><div class="l ptr"><span class="n"></span><span class="t">                   ^^^^^^^^^^^^^^^^</span></div><div class="l"><span class="n">4</span><span class="t">        total += numbers[i]</span></div><div class="l"><span class="n">5</span><span class="t">    <span class="k">return</span> total</span></div></pre>
+      <p class="pointer-cap">sum_list([1, 2, 3]) returns 3. Why?</p>
+    </div>
+  </div></section>
+
+  <div class="wrap">
+    <div class="progress" aria-label="Progress">
+      <span class="label">Solved</span>
+      <span class="dots" id="dots" aria-hidden="true"></span>
+      <span class="count" id="count"></span>
+    </div>
+
+    <div class="filters" role="group" aria-label="Filter by difficulty" id="filters">
+      <button aria-pressed="true" data-f="all">all</button>
+      <button aria-pressed="false" data-f="easy">easy</button>
+      <button aria-pressed="false" data-f="medium">medium</button>
+      <button aria-pressed="false" data-f="hard">hard</button>
+    </div>
+
+    <div id="list">
+      <div class="list-head"><span class="label">#</span><span class="label">Exercise</span><span class="label">The bug</span><span class="label">Steps</span><span class="label">Level</span><span class="label">Status</span></div>
+      <div class="list" id="rows"></div>
+    </div>
+  </div>
+</main>
+
+<footer><div class="wrap">
+  <span>BugLab · open source · MIT</span>
+  <span>Python runs in your browser. Nothing leaves it.</span>
+</div></footer>
+
+<div class="note"><b>Mockup · home.</b> Dark only. The row for a solved exercise reveals the name of the bug; unsolved rows keep it hidden so the list never spoils. Resize to ~375px to see the phone layout.</div>
+
+<script>
+  const data = [
+    ["001","Off By One","loops · indexing","off-by-one-range","easy"],
+    ["002","The Silent Return","functions · return","return-inside-loop","easy"],
+    ["003","Is It Prime?","math · conditions","boundary-conditions","medium"],
+    ["004","The Haunted List","functions · defaults","mutable-default-argument","medium"],
+    ["005","One Too Many","math · counters","accumulator-initial-value","medium"],
+    ["006","Closure Trap","closures · scope","late-binding-closure","hard"],
+    ["007","Vanishing Elements","lists · iteration","mutating-while-iterating","hard"],
+    ["008","Exhausted","generators · iterators","exhausted-iterator","hard"],
+    ["009","Identity Crisis","comparison · identity","identity-vs-equality","medium"],
+    ["010","Almost Equal","floats · precision","float-equality","medium"],
+    ["011","Sorted by Nothing","lists · sorting","in-place-methods-return-none","easy"],
+    ["012","The Lost Return","recursion · control-flow","missing-return-path","medium"],
+    ["013","Zero Product","loops · accumulator","accumulator-initial-value","easy"],
+    ["014","Wrong by Design","operators · precedence","operator-precedence","easy"],
+    ["015","Read-Only","strings · immutability","immutable-strings","easy"],
+    ["016","Missing Key","dicts · KeyError","missing-dict-key","medium"],
+    ["017","The Shared Row","lists · references","shared-references","hard"],
+    ["018","Wrong Rank","loops · enumerate","enumerate-start","easy"],
+    ["019","Misleading Truth","booleans · truthiness","truthiness","easy"],
+    ["020","The Ignored Stars","functions · args","argument-unpacking","medium"]
+  ];
+  // fake progress for the mockup: which steps are done per exercise
+  const done = { "001": "PLEF", "002": "PLEF", "003": "PL", "004": "P" };
+  const solved = (id) => (done[id] || "").includes("F");
+
+  const rows = document.getElementById("rows");
+  function render(filter) {
+    rows.innerHTML = "";
+    data.filter(d => filter === "all" || d[4] === filter).forEach(([id, title, tags, concept, level]) => {
+      const d = done[id] || "";
+      const isSolved = d.includes("F");
+      const steps = ["P","L","E","F"].map(s => `<b class="${d.includes(s) ? "on" : ""}">${s}</b>`).join(" ");
+      const a = document.createElement("a");
+      a.className = "row"; a.href = "exercise.html";
+      a.innerHTML = `
+        <span class="num">${id}</span>
+        <span><span class="title">${title}</span><div class="tags">${tags.split(" · ").map(t => `<span class="tag">${t}</span>`).join("")}</div></span>
+        <span class="concept ${isSolved ? "found" : "hidden"}">${isSolved ? concept : "not found yet"}</span>
+        <span class="mini"><span class="steps" aria-label="steps done: ${d || "none"}">${steps}</span>
+        <span class="diffcell diff ${level}">${level}</span></span>
+        <span class="state ${isSolved ? "solved" : "open"}">${isSolved ? "● solved" : d ? "in progress" : "open"}</span>`;
+      rows.appendChild(a);
+    });
+  }
+  render("all");
+  document.getElementById("filters").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    document.querySelectorAll("#filters button").forEach(x => x.setAttribute("aria-pressed", x === b));
+    render(b.dataset.f);
+  });
+  const n = data.filter(d => solved(d[0])).length;
+  document.getElementById("dots").innerHTML = data.map(d => solved(d[0]) ? '<span class="ok">.</span>' : "·").join("");
+  document.getElementById("count").innerHTML = `<b>${n}</b> of ${data.length} solved`;
+</script>
+</body>
+</html>
