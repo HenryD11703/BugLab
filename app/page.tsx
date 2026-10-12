@@ -11,7 +11,7 @@ export default function HomePage() {
     difficulty: ex.difficulty,
     tags: ex.tags,
     description: ex.description,
-    testCount: ex.tests.length,
+    testCount: ex.fix?.tests.length ?? 0,
   }));
 
   const counts = {

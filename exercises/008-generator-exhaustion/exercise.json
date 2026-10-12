@@ -1,34 +1,64 @@
 {
   "title": "Exhausted",
   "difficulty": "hard",
-  "tags": ["generators", "iterators", "gotcha"],
+  "tags": [
+    "generators",
+    "iterators",
+    "gotcha"
+  ],
+  "concept": "exhausted-iterator",
   "description": "The function `count_positives_and_negatives(numbers)` takes a list of numbers and returns a tuple `(pos, neg)` — the count of positive numbers and the count of negative numbers. Zeros are excluded.\n\nFor most inputs it returns the **right count for positives**, but the negative count **always comes out as `0`**, no matter what's in the list.\n\nThe logic looks correct. The filter is right. The counting loops are right. So why does one of them always return zero?",
   "hints": [
     "Run the function with `[1, -2, 3, -4, 0]`. You should get `(2, 2)`. What do you actually get? Which of the two counts is wrong?",
     "A generator expression like `(x for x in ...)` can only be iterated **once**. After the `positives` loop exhausts it, the generator is empty — the `negatives` loop finds nothing left to iterate.",
     "Change the generator to a list so it can be iterated multiple times: `filtered = [x for x in numbers if x != 0]`. Lists, unlike generators, can be traversed as many times as you need."
   ],
-  "tests": [
-    {
-      "description": "mixed numbers",
-      "input": "count_positives_and_negatives([1, -2, 3, -4, 0])",
-      "expectedOutput": "(2, 2)"
-    },
-    {
-      "description": "all positive",
-      "input": "count_positives_and_negatives([1, 2, 3])",
-      "expectedOutput": "(3, 0)"
-    },
-    {
-      "description": "all negative",
-      "input": "count_positives_and_negatives([-1, -2, -3])",
-      "expectedOutput": "(0, 3)"
-    },
-    {
-      "description": "only zeros",
-      "input": "count_positives_and_negatives([0, 0, 0])",
-      "expectedOutput": "(0, 0)"
-    }
-  ],
-  "requirements": {}
+  "explanation": "A generator can be consumed only once. The first `sum(...)` used up `filtered`, so the second one found nothing and returned 0. A list can be traversed as many times as needed.\n\nIf you need to loop over data twice, store it in a list.",
+  "predict": {
+    "code": "count_positives_and_negatives([1, -2, 3, -4, 0])",
+    "answer": "(2, 0)"
+  },
+  "locate": {
+    "bugs": [
+      {
+        "lines": [
+          8,
+          10
+        ]
+      }
+    ]
+  },
+  "explain": {
+    "question": "Why is the negative count always 0?",
+    "options": [
+      "The generator is used up after the first count, so the second one sees nothing",
+      "`x < 0` never matches inside a generator",
+      "`sum(1 for ...)` can only count positive numbers"
+    ],
+    "correct": 0
+  },
+  "fix": {
+    "tests": [
+      {
+        "description": "mixed numbers",
+        "input": "count_positives_and_negatives([1, -2, 3, -4, 0])",
+        "expected": "(2, 2)"
+      },
+      {
+        "description": "all positive",
+        "input": "count_positives_and_negatives([1, 2, 3])",
+        "expected": "(3, 0)"
+      },
+      {
+        "description": "all negative",
+        "input": "count_positives_and_negatives([-1, -2, -3])",
+        "expected": "(0, 3)"
+      },
+      {
+        "description": "only zeros",
+        "input": "count_positives_and_negatives([0, 0, 0])",
+        "expected": "(0, 0)"
+      }
+    ]
+  }
 }

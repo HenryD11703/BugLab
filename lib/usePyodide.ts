@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useSyncExternalStore, useCallback } from "react";
-import { Exercise, Requirements, RunResult, TestResult } from "./types";
+import { Exercise, RunResult, TestResult } from "./types";
+import { Requirements, toLegacyRequirements } from "./legacy";
 
 declare global {
   interface Window {
@@ -200,8 +201,9 @@ export function usePyodide() {
       }
 
       // --- Step 1: Check requirements (before running any tests) ---
-      const requirementErrors = exercise.requirements
-        ? await checkRequirementsAST(pyodide, code, exercise.requirements)
+      const requirements = toLegacyRequirements(exercise.fix?.constraints);
+      const requirementErrors = requirements
+        ? await checkRequirementsAST(pyodide, code, requirements)
         : [];
 
       // If requirements are not met, skip tests entirely
@@ -220,9 +222,9 @@ export function usePyodide() {
       pyodide.setStderr({ batched: (t: string) => { capturedOutput += t + "\n"; } });
 
       // --- Step 3: Run setup code ---
-      if (exercise.setupCode) {
+      if (exercise.fix?.setup) {
         try {
-          await pyodide.runPythonAsync(exercise.setupCode);
+          await pyodide.runPythonAsync(exercise.fix.setup);
         } catch { /* ignore */ }
       }
 
@@ -243,8 +245,9 @@ export function usePyodide() {
       const results: TestResult[] = [];
       let allPassed = true;
 
-      for (let i = 0; i < exercise.tests.length; i++) {
-        const test = exercise.tests[i];
+      const tests = exercise.fix?.tests ?? [];
+      for (let i = 0; i < tests.length; i++) {
+        const test = tests[i];
         let actualOutput = "";
         let passed = false;
         let error: string | undefined;
@@ -252,7 +255,7 @@ export function usePyodide() {
         try {
           const result = await pyodide.runPythonAsync(`str(${test.input})`);
           actualOutput = String(result).trim();
-          passed = actualOutput === test.expectedOutput.trim();
+          passed = actualOutput === test.expected.trim();
         } catch (err) {
           error = String(err);
           passed = false;
@@ -264,7 +267,7 @@ export function usePyodide() {
           index: i,
           description: test.description,
           input: test.input,
-          expectedOutput: test.expectedOutput,
+          expectedOutput: test.expected,
           actualOutput,
           passed,
           error,

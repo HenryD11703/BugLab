@@ -25,11 +25,15 @@ exercises/004-mutable-default/
   "title": "The Haunted List", "difficulty": "medium", "concept": "mutable-default-argument",
   "description": "...", "hints": ["...", "...", "..."], "explanation": "...",
   "predict": { "call": "append_to(1)\nappend_to(2)", "answer": "[1, 2]" },
-  "locate":  { "lines": [1] },
-  "explain": { "options": ["...", "...", "..."], "correct": 0 },
+  "locate":  { "bugs": [{ "lines": [1] }] },
+  "explain": { "question": "...", "options": ["...", "...", "..."], "correct": 0 },
   "fix":     { "tests": [{ "input": "append_to(1)", "expected": "[1]" }], "constraints": { "mustUseKeyword": ["None"] } }
 }
 ```
+
+- `predict.answer` is what the **buggy** code gives for the last expression of `predict.code`, or the exception class name (`TypeError`). CI checks it against CPython.
+- `locate.bugs` has one group per bug; each group lists equivalent lines. The learner finds a bug by marking any line of its group, and must find every group.
+- `fix.constraints`: `mustUseKeyword` (Python reserved words only), `mustCall` / `mustNotCall` (a name matches `f(...)` and `obj.f(...)`), `mustNotImport`, `mustUseLoop`, `mustUseRecursion`.
 
 Schema library: **zod**. Rejected: a hand-written validator, since error messages and types come free. One small dependency.
 

@@ -1,0 +1,74 @@
+{
+  "title": "Vanishing Elements",
+  "difficulty": "hard",
+  "tags": [
+    "lists",
+    "iteration",
+    "mutation"
+  ],
+  "concept": "mutating-while-iterating",
+  "description": "The function `remove_negatives(numbers)` should return a list with all negative numbers removed.\n\nIt seems to work for some inputs, but with others **some negatives survive** even though the code clearly checks every element.\n\nThis is a particularly nasty bug — the code looks completely correct. The logic is right. **Yet the output is wrong.**",
+  "hints": [
+    "Try `remove_negatives([-1, -2, 3])`. Do you get `[3]`? What do you actually get?",
+    "What happens to the list's internal index counter when you call `numbers.remove(n)` during iteration? The list shrinks — but the iterator doesn't know that.",
+    "When you remove `-1` (index 0), the list becomes `[-2, 3]` and the iterator advances to index 1, which is now `3`. It **skips** `-2` entirely. Never mutate a collection while iterating it. Build a new list instead."
+  ],
+  "explanation": "Removing items from a list while looping over it shifts the remaining items left, and the loop's internal index then skips the element that moved into the gap. Build a new list with the items you want to keep instead.\n\nNever change a collection while you iterate over it.",
+  "predict": {
+    "code": "remove_negatives([-1, -2, 3])",
+    "answer": "[-2, 3]"
+  },
+  "locate": {
+    "bugs": [
+      {
+        "lines": [
+          2,
+          4
+        ]
+      }
+    ]
+  },
+  "explain": {
+    "question": "Why do some negatives survive?",
+    "options": [
+      "`remove` only deletes the last matching value",
+      "Removing an item while looping makes the loop skip the next one",
+      "`n < 0` is false for the second negative number"
+    ],
+    "correct": 1
+  },
+  "fix": {
+    "tests": [
+      {
+        "description": "consecutive negatives are the trap",
+        "input": "remove_negatives([-1, -2, 3])",
+        "expected": "[3]"
+      },
+      {
+        "description": "all positive — no change",
+        "input": "remove_negatives([1, 2, 3])",
+        "expected": "[1, 2, 3]"
+      },
+      {
+        "description": "all negative — empty result",
+        "input": "remove_negatives([-5, -3, -1])",
+        "expected": "[]"
+      },
+      {
+        "description": "mixed",
+        "input": "remove_negatives([4, -1, 5, -2, 6])",
+        "expected": "[4, 5, 6]"
+      },
+      {
+        "description": "zero is not negative",
+        "input": "remove_negatives([-1, 0, 1])",
+        "expected": "[0, 1]"
+      }
+    ],
+    "constraints": {
+      "mustUseKeyword": [
+        "for"
+      ]
+    }
+  }
+}

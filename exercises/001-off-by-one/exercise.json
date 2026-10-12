@@ -1,37 +1,71 @@
 {
   "title": "Off By One",
   "difficulty": "easy",
-  "tags": ["loops", "indexing", "classic"],
+  "tags": [
+    "loops",
+    "indexing",
+    "classic"
+  ],
+  "concept": "off-by-one-range",
   "description": "The function `sum_list` should return the sum of all elements in a list.\n\nSomething is wrong — it seems to miss the last element. **Find the bug and fix it.**\n\nDon't use `sum()` built-in — you must iterate manually.",
   "hints": [
     "Think carefully about what `range(n - 1)` actually produces. What's the last index it covers?",
     "`range(len(numbers) - 1)` stops *before* the last element. Try `range(len(numbers))` instead.",
     "Alternatively, you can iterate directly: `for n in numbers:` avoids indexing altogether."
   ],
-  "tests": [
-    {
-      "description": "basic sum",
-      "input": "sum_list([1, 2, 3, 4, 5])",
-      "expectedOutput": "15"
-    },
-    {
-      "description": "single element",
-      "input": "sum_list([42])",
-      "expectedOutput": "42"
-    },
-    {
-      "description": "empty list",
-      "input": "sum_list([])",
-      "expectedOutput": "0"
-    },
-    {
-      "description": "negatives",
-      "input": "sum_list([-1, -2, -3])",
-      "expectedOutput": "-6"
+  "explanation": "`range(n)` already stops *before* `n`, so `range(len(numbers))` visits every index. Subtracting 1 stops one index too early and the last element is never added.\n\nWhen a loop skips its first or last item, check the bounds of the `range` first.",
+  "predict": {
+    "code": "sum_list([1, 2, 3])",
+    "answer": "3"
+  },
+  "locate": {
+    "bugs": [
+      {
+        "lines": [
+          3
+        ]
+      }
+    ]
+  },
+  "explain": {
+    "question": "Why is the last number missing from the total?",
+    "options": [
+      "`total` starts at 0, so the first number is lost",
+      "The loop stops one index early, so the last element is never visited",
+      "`+=` does not add numbers inside a loop"
+    ],
+    "correct": 1
+  },
+  "fix": {
+    "tests": [
+      {
+        "description": "basic sum",
+        "input": "sum_list([1, 2, 3, 4, 5])",
+        "expected": "15"
+      },
+      {
+        "description": "single element",
+        "input": "sum_list([42])",
+        "expected": "42"
+      },
+      {
+        "description": "empty list",
+        "input": "sum_list([])",
+        "expected": "0"
+      },
+      {
+        "description": "negatives",
+        "input": "sum_list([-1, -2, -3])",
+        "expected": "-6"
+      }
+    ],
+    "constraints": {
+      "mustNotCall": [
+        "sum"
+      ],
+      "mustUseKeyword": [
+        "for"
+      ]
     }
-  ],
-  "requirements": {
-    "mustNotCallBuiltin": ["sum"],
-    "mustContainKeyword": ["for"]
   }
 }

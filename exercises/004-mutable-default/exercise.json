@@ -1,36 +1,68 @@
 {
   "title": "The Haunted List",
   "difficulty": "medium",
-  "tags": ["functions", "defaults", "gotcha"],
+  "tags": [
+    "functions",
+    "defaults",
+    "gotcha"
+  ],
+  "concept": "mutable-default-argument",
   "description": "The function `append_to` should take an element and an optional list, append the element to it, and return the result.\n\nWhen called **without** a second argument, it should always start fresh with an empty list.\n\nBut something strange is happening — it seems to **remember** values between calls. How?",
   "hints": [
     "Call `append_to(1)` three times in a row and observe the return value each time. What do you notice?",
     "In Python, default argument values are evaluated **once** when the function is defined — not every time the function is called. So `to=[]` creates one list that persists across all calls.",
     "The fix: use `None` as the default, then assign a new `[]` inside the function body if `to` is `None`."
   ],
-  "tests": [
-    {
-      "description": "first call returns one element",
-      "input": "append_to(1)",
-      "expectedOutput": "[1]"
-    },
-    {
-      "description": "second call with same signature is independent",
-      "input": "append_to(2)",
-      "expectedOutput": "[2]"
-    },
-    {
-      "description": "explicit list is used as-is",
-      "input": "append_to(3, [10, 20])",
-      "expectedOutput": "[10, 20, 3]"
-    },
-    {
-      "description": "third independent call",
-      "input": "append_to(99)",
-      "expectedOutput": "[99]"
+  "explanation": "A default value is evaluated **once**, when `def` runs, not on every call. `to=[]` creates a single list that all calls share, so it keeps growing. Use `None` as the default and create the list inside the function.\n\nNever use a list, dict or set as a default argument value.",
+  "predict": {
+    "code": "append_to(1)\nappend_to(2)",
+    "answer": "[1, 2]"
+  },
+  "locate": {
+    "bugs": [
+      {
+        "lines": [
+          1
+        ]
+      }
+    ]
+  },
+  "explain": {
+    "question": "Why does the list remember earlier values?",
+    "options": [
+      "`append` copies the list into a global variable",
+      "The default `[]` is created once, when `def` runs, and every call shares it",
+      "Python caches the result of calls with the same arguments"
+    ],
+    "correct": 1
+  },
+  "fix": {
+    "tests": [
+      {
+        "description": "first call returns one element",
+        "input": "append_to(1)",
+        "expected": "[1]"
+      },
+      {
+        "description": "second call with same signature is independent",
+        "input": "append_to(2)",
+        "expected": "[2]"
+      },
+      {
+        "description": "explicit list is used as-is",
+        "input": "append_to(3, [10, 20])",
+        "expected": "[10, 20, 3]"
+      },
+      {
+        "description": "third independent call",
+        "input": "append_to(99)",
+        "expected": "[99]"
+      }
+    ],
+    "constraints": {
+      "mustUseKeyword": [
+        "None"
+      ]
     }
-  ],
-  "requirements": {
-    "mustContainKeyword": ["None"]
   }
 }

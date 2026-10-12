@@ -1,34 +1,63 @@
 {
   "title": "The Ignored Stars",
   "difficulty": "medium",
-  "tags": ["functions", "args", "unpacking"],
-  "description": "The function `product_of_list(numbers)` should return the product of all numbers in a list. It delegates the actual multiplication to a helper `multiply_all(*args)`, which takes individual numbers as separate arguments.\n\nThe function always **crashes with a `TypeError`**. The helper `multiply_all` is correct — the bug is in how `product_of_list` calls it.\n\nCan you spot the two missing characters?",
+  "tags": [
+    "functions",
+    "args",
+    "unpacking"
+  ],
+  "concept": "argument-unpacking",
+  "description": "The function `product_of_list(numbers)` should return the product of all numbers in a list. It delegates the actual multiplication to a helper `multiply_all(*args)`, which takes individual numbers as separate arguments.\n\nIt never crashes, but `product_of_list([2, 3, 4])` returns `[2, 3, 4]` instead of `24`. The helper `multiply_all` is correct, so the bug is in how `product_of_list` calls it.\n\nCan you spot the one missing character?",
   "hints": [
     "Try `product_of_list([2, 3, 4])`. Read the error message. What does `multiply_all` actually receive? Add a `print(args)` inside `multiply_all` to see.",
     "`multiply_all(numbers)` passes the entire list as one argument. Inside `multiply_all`, `args` becomes `([2, 3, 4],)` — a tuple containing one list. Then `result *= [2, 3, 4]` fails because you can't multiply an integer by a list.",
     "To pass all elements of a list as individual arguments, **unpack** it with the `*` operator: `multiply_all(*numbers)`. The `*` spreads the list into separate positional arguments."
   ],
-  "tests": [
-    {
-      "description": "basic product",
-      "input": "product_of_list([2, 3, 4])",
-      "expectedOutput": "24"
-    },
-    {
-      "description": "includes 1 — no effect on product",
-      "input": "product_of_list([1, 5, 2])",
-      "expectedOutput": "10"
-    },
-    {
-      "description": "single element",
-      "input": "product_of_list([7])",
-      "expectedOutput": "7"
-    },
-    {
-      "description": "larger product",
-      "input": "product_of_list([2, 3, 4, 5])",
-      "expectedOutput": "120"
-    }
-  ],
-  "requirements": {}
+  "explanation": "`multiply_all(numbers)` passes the whole list as one argument, so `args` is `([2, 3, 4],)` and `1 * [2, 3, 4]` repeats the list instead of multiplying numbers. `multiply_all(*numbers)` unpacks the list into separate arguments.\n\n`*` in a call spreads a list into arguments; `*args` in a definition collects them.",
+  "predict": {
+    "code": "product_of_list([2, 3, 4])",
+    "answer": "[2, 3, 4]"
+  },
+  "locate": {
+    "bugs": [
+      {
+        "lines": [
+          16
+        ]
+      }
+    ]
+  },
+  "explain": {
+    "question": "Why is the result a list and not a number?",
+    "options": [
+      "`multiply_all` starts with `result = 1`, which is a list",
+      "The list is passed as one argument instead of being unpacked",
+      "`*args` cannot receive more than one value"
+    ],
+    "correct": 1
+  },
+  "fix": {
+    "tests": [
+      {
+        "description": "basic product",
+        "input": "product_of_list([2, 3, 4])",
+        "expected": "24"
+      },
+      {
+        "description": "includes 1 — no effect on product",
+        "input": "product_of_list([1, 5, 2])",
+        "expected": "10"
+      },
+      {
+        "description": "single element",
+        "input": "product_of_list([7])",
+        "expected": "7"
+      },
+      {
+        "description": "larger product",
+        "input": "product_of_list([2, 3, 4, 5])",
+        "expected": "120"
+      }
+    ]
+  }
 }

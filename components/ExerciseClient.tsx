@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { Exercise, RunResult } from "@/lib/types";
 import { usePyodide } from "@/lib/usePyodide";
 import { markCompleted } from "@/lib/progress";
+import { toLegacyRequirements } from "@/lib/legacy";
 import dynamic from "next/dynamic";
 import TestResults from "./TestResults";
 import HintsPanel from "./HintsPanel";
@@ -165,9 +166,9 @@ export default function ExerciseClient({ exercise }: ExerciseClientProps) {
             />
 
             {/* Requirements badge */}
-            {exercise.requirements &&
+            {exercise.fix?.constraints &&
               (() => {
-                const r = exercise.requirements;
+                const r = toLegacyRequirements(exercise.fix.constraints)!;
                 const items: { label: string; value: string; must: boolean }[] =
                   [
                     ...(r.mustContainKeyword ?? []).map((k) => ({

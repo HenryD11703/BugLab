@@ -1,34 +1,63 @@
 {
   "title": "Wrong by Design",
   "difficulty": "easy",
-  "tags": ["operators", "precedence", "math"],
+  "tags": [
+    "operators",
+    "precedence",
+    "math"
+  ],
+  "concept": "operator-precedence",
   "description": "The function `average(a, b, c)` should return the arithmetic mean of three numbers: add them all up and divide by three.\n\nThe formula is written right there on one line. But for most inputs, the result is **way off** — usually too high.\n\nCan you spot where the math breaks down?",
   "hints": [
     "Try `average(1, 2, 3)`. The answer should be `2.0`. What do you get?",
     "Python evaluates `a + b + c / 3` as `a + b + (c / 3)` — division has higher precedence than addition, so only `c` is divided by `3`. The other two numbers are added without being divided.",
     "Wrap the entire sum in parentheses so the division applies to all three: `return (a + b + c) / 3`."
   ],
-  "tests": [
-    {
-      "description": "basic average",
-      "input": "average(1, 2, 3)",
-      "expectedOutput": "2.0"
-    },
-    {
-      "description": "equal values",
-      "input": "average(5, 5, 5)",
-      "expectedOutput": "5.0"
-    },
-    {
-      "description": "larger numbers",
-      "input": "average(10, 20, 30)",
-      "expectedOutput": "20.0"
-    },
-    {
-      "description": "with zero",
-      "input": "average(0, 6, 3)",
-      "expectedOutput": "3.0"
-    }
-  ],
-  "requirements": {}
+  "explanation": "Division binds tighter than addition, so `a + b + c / 3` divides only `c`. Parentheses make the sum happen first: `(a + b + c) / 3`.\n\nWhen unsure about precedence, add parentheses.",
+  "predict": {
+    "code": "average(1, 2, 3)",
+    "answer": "4.0"
+  },
+  "locate": {
+    "bugs": [
+      {
+        "lines": [
+          7
+        ]
+      }
+    ]
+  },
+  "explain": {
+    "question": "Why is the result too high?",
+    "options": [
+      "`/` is evaluated before `+`, so only `c` is divided by 3",
+      "`/` always rounds up in Python",
+      "`a + b + c` is evaluated from right to left"
+    ],
+    "correct": 0
+  },
+  "fix": {
+    "tests": [
+      {
+        "description": "basic average",
+        "input": "average(1, 2, 3)",
+        "expected": "2.0"
+      },
+      {
+        "description": "equal values",
+        "input": "average(5, 5, 5)",
+        "expected": "5.0"
+      },
+      {
+        "description": "larger numbers",
+        "input": "average(10, 20, 30)",
+        "expected": "20.0"
+      },
+      {
+        "description": "with zero",
+        "input": "average(0, 6, 3)",
+        "expected": "3.0"
+      }
+    ]
+  }
 }

@@ -1,36 +1,68 @@
 {
   "title": "Wrong Rank",
   "difficulty": "easy",
-  "tags": ["loops", "enumerate", "off-by-one"],
+  "tags": [
+    "loops",
+    "enumerate",
+    "off-by-one"
+  ],
+  "concept": "enumerate-start",
   "description": "The function `rank_players(scores)` takes a list of `(name, score)` tuples — already sorted highest to lowest — and returns a list of ranking strings like `\"1. Alice: 95\"`, `\"2. Bob: 87\"`.\n\nThe function runs without errors, but all the rank numbers are **off by one**. Every player shows rank `0`, `1`, `2`... instead of `1`, `2`, `3`.\n\nOne small parameter change is all it takes.",
   "hints": [
     "Call `rank_players([(\"Alice\", 95), (\"Bob\", 87)])`. What rank numbers appear? What should they be?",
     "`enumerate(iterable)` counts from `0` by default. So the first player gets index `0`, the second `1`, and so on — all off by one.",
     "`enumerate` accepts an optional `start` parameter. Use `enumerate(scores, 1)` to begin counting at `1` instead of `0`."
   ],
-  "tests": [
-    {
-      "description": "two players, ranks start at 1",
-      "input": "rank_players([('Alice', 95), ('Bob', 87)])",
-      "expectedOutput": "['1. Alice: 95', '2. Bob: 87']"
-    },
-    {
-      "description": "single player ranked 1st",
-      "input": "rank_players([('Charlie', 100)])",
-      "expectedOutput": "['1. Charlie: 100']"
-    },
-    {
-      "description": "three players",
-      "input": "rank_players([('X', 9), ('Y', 7), ('Z', 5)])",
-      "expectedOutput": "['1. X: 9', '2. Y: 7', '3. Z: 5']"
-    },
-    {
-      "description": "empty leaderboard",
-      "input": "rank_players([])",
-      "expectedOutput": "[]"
+  "explanation": "`enumerate` counts from 0 unless told otherwise. `enumerate(scores, 1)` (or `start=1`) makes ranks begin at 1.\n\nCounting from 0 is for indexes; counting from 1 is for people.",
+  "predict": {
+    "code": "rank_players([('Alice', 95), ('Bob', 87)])",
+    "answer": "['0. Alice: 95', '1. Bob: 87']"
+  },
+  "locate": {
+    "bugs": [
+      {
+        "lines": [
+          12
+        ]
+      }
+    ]
+  },
+  "explain": {
+    "question": "Why do the ranks start at 0?",
+    "options": [
+      "`enumerate` counts from 0 by default",
+      "f-strings subtract 1 from numbers",
+      "The list is sorted from lowest to highest"
+    ],
+    "correct": 0
+  },
+  "fix": {
+    "tests": [
+      {
+        "description": "two players, ranks start at 1",
+        "input": "rank_players([('Alice', 95), ('Bob', 87)])",
+        "expected": "['1. Alice: 95', '2. Bob: 87']"
+      },
+      {
+        "description": "single player ranked 1st",
+        "input": "rank_players([('Charlie', 100)])",
+        "expected": "['1. Charlie: 100']"
+      },
+      {
+        "description": "three players",
+        "input": "rank_players([('X', 9), ('Y', 7), ('Z', 5)])",
+        "expected": "['1. X: 9', '2. Y: 7', '3. Z: 5']"
+      },
+      {
+        "description": "empty leaderboard",
+        "input": "rank_players([])",
+        "expected": "[]"
+      }
+    ],
+    "constraints": {
+      "mustCall": [
+        "enumerate"
+      ]
     }
-  ],
-  "requirements": {
-    "mustContainKeyword": ["enumerate"]
   }
 }
