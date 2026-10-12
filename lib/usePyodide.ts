@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useSyncExternalStore, useCallback } from "react";
 import { Exercise, Requirements, RunResult, TestResult } from "./types";
 
 declare global {
@@ -133,44 +133,62 @@ async function checkRequirementsAST(pyodide: any, code: string, reqs: Requiremen
   return violations;
 }
 
+// Loading state lives outside React so every component shares one load and the
+// hook can subscribe with useSyncExternalStore instead of syncing in an effect.
+let loadStatus: PyodideStatus = "idle";
+const statusListeners = new Set<() => void>();
+
+function setLoadStatus(next: PyodideStatus) {
+  loadStatus = next;
+  statusListeners.forEach((l) => l());
+}
+
+function subscribeStatus(onChange: () => void) {
+  statusListeners.add(onChange);
+  return () => {
+    statusListeners.delete(onChange);
+  };
+}
+
+function ensurePyodideLoaded() {
+  if (loadStatus !== "idle") return;
+  if (window._pyodideInstance) {
+    setLoadStatus("ready");
+    return;
+  }
+  setLoadStatus("loading");
+
+  const script = document.createElement("script");
+  script.src = "https://cdn.jsdelivr.net/pyodide/v0.27.4/full/pyodide.js";
+  script.async = true;
+  script.onload = async () => {
+    try {
+      window._pyodideInstance = await window.loadPyodide({
+        indexURL: "https://cdn.jsdelivr.net/pyodide/v0.27.4/full/",
+      });
+      setLoadStatus("ready");
+    } catch {
+      setLoadStatus("error");
+    }
+  };
+  script.onerror = () => setLoadStatus("error");
+  document.head.appendChild(script);
+}
+
 export function usePyodide() {
-  const [status, setStatus] = useState<PyodideStatus>("idle");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pyodideRef = useRef<any>(null);
+  const status = useSyncExternalStore(
+    subscribeStatus,
+    () => loadStatus,
+    (): PyodideStatus => "idle"
+  );
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    if (window._pyodideInstance) {
-      pyodideRef.current = window._pyodideInstance;
-      setStatus("ready");
-      return;
-    }
-
-    setStatus("loading");
-
-    const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/pyodide/v0.27.4/full/pyodide.js";
-    script.async = true;
-    script.onload = async () => {
-      try {
-        const pyodide = await window.loadPyodide({
-          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.27.4/full/",
-        });
-        window._pyodideInstance = pyodide;
-        pyodideRef.current = pyodide;
-        setStatus("ready");
-      } catch {
-        setStatus("error");
-      }
-    };
-    script.onerror = () => setStatus("error");
-    document.head.appendChild(script);
+    ensurePyodideLoaded();
   }, []);
 
   const runExercise = useCallback(
     async (code: string, exercise: Exercise): Promise<RunResult> => {
-      const pyodide = pyodideRef.current;
+      const pyodide = window._pyodideInstance;
       if (!pyodide) {
         return {
           status: "error",

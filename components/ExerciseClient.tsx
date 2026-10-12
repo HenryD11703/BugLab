@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { Exercise, RunResult } from "@/lib/types";
 import { usePyodide } from "@/lib/usePyodide";
+import { markCompleted } from "@/lib/progress";
 import dynamic from "next/dynamic";
 import TestResults from "./TestResults";
 import HintsPanel from "./HintsPanel";
@@ -77,20 +78,7 @@ export default function ExerciseClient({ exercise }: ExerciseClientProps) {
 
   // Save to localStorage when all tests pass
   useEffect(() => {
-    if (result?.status === "passed") {
-      try {
-        const raw = localStorage.getItem("buglab:completed") ?? "[]";
-        const completed: string[] = JSON.parse(raw);
-        if (!completed.includes(exercise.id)) {
-          localStorage.setItem(
-            "buglab:completed",
-            JSON.stringify([...completed, exercise.id])
-          );
-        }
-      } catch {
-        // localStorage unavailable — ignore
-      }
-    }
+    if (result?.status === "passed") markCompleted(exercise.id);
   }, [result, exercise.id]);
 
   return (

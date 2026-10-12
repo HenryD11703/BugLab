@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Difficulty } from "@/lib/types";
+import { useCompleted } from "@/lib/progress";
 
 const DIFF_COLOR: Record<Difficulty, string> = {
   easy: "#6BCB77",
@@ -33,16 +34,8 @@ function isWide(index: number) {
 
 export default function ExerciseGrid({ exercises }: ExerciseGridProps) {
   const [difficulty, setDifficulty] = useState<Difficulty | "all">("all");
-  const [completed, setCompleted] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("buglab:completed") ?? "[]";
-      setCompleted(new Set(JSON.parse(raw)));
-    } catch {
-      // localStorage unavailable
-    }
-  }, []);
+  const completedIds = useCompleted();
+  const completed = useMemo(() => new Set(completedIds), [completedIds]);
 
   const filtered = useMemo(
     () =>
