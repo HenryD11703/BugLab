@@ -1,35 +1,58 @@
 import { expect, test } from "@playwright/test";
-import { run, setCode, waitForPython } from "./helpers";
-
-const EXERCISE = "/exercise/014-operator-precedence";
-const FIXED = "def average(a, b, c):\n    return (a + b + c) / 3\n";
+import { EX_014, FIXED_014, openFix, openRead, openStep, run, setCode } from "./helpers";
 
 test.describe("progress", () => {
-  test("the code a learner wrote survives a reload, and Reset clears it", async ({ page }) => {
-    await page.goto(EXERCISE);
+  test("the code a learner wrote survives a reload, and reset clears it", async ({ page }) => {
+    await page.goto(EX_014);
+    await openFix(page);
     await setCode(page, "def average(a, b, c):\n    return 42  # my attempt\n");
 
     await page.reload();
+    await openStep(page, "Fix");
     await expect(page.locator(".cm-content")).toContainText("my attempt");
 
-    await page.getByRole("button", { name: "Reset" }).click();
+    await page.getByRole("button", { name: "reset", exact: true }).click();
     await expect(page.locator(".cm-content")).not.toContainText("my attempt");
     await page.reload();
+    await openStep(page, "Fix");
     await expect(page.locator(".cm-content")).not.toContainText("my attempt");
   });
 
   test("a solved exercise shows as solved on the home page after a reload", async ({ page }) => {
-    await page.goto(EXERCISE);
-    await waitForPython(page);
-    await setCode(page, FIXED);
+    await page.goto(EX_014);
+    await openFix(page);
+    await setCode(page, FIXED_014);
     await run(page);
-    await expect(page.getByText("All tests passed")).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText("4 passed")).toBeVisible({ timeout: 30_000 });
 
     await page.goto("/");
-    await expect(page.locator('a[href="/exercise/014-operator-precedence"]')).toContainText("solved");
+    const row = page.locator('a[href="/exercise/014-operator-precedence"]');
+    await expect(row).toContainText("solved");
+    // the name of the bug is revealed once it is solved, and only then
+    await expect(row).toContainText("operator-precedence");
+    await expect(page.locator('a[href="/exercise/001-off-by-one"]')).not.toContainText("off-by-one-range");
     await page.reload();
-    await expect(page.locator('a[href="/exercise/014-operator-precedence"]')).toContainText("solved");
-    await expect(page.locator('a[href="/exercise/001-off-by-one"]')).not.toContainText("solved");
+    await expect(row).toContainText("solved");
+    await expect(page.getByText("1 of 20 solved")).toBeVisible();
+  });
+
+  test("completed steps and opened hints are remembered", async ({ page }) => {
+    await page.goto("/exercise/004-mutable-default");
+    await openStep(page, "Predict");
+    await page.getByPlaceholder("type the output").fill("[1, 2]");
+    await page.getByRole("button", { name: "Check" }).click();
+    await expect(page.getByText(/^Right\./)).toBeVisible();
+
+    await openRead(page);
+    await page.getByRole("button", { name: /^hint 1/ }).click();
+    await expect(page.getByText(/three times in a row/)).toBeVisible();
+
+    await page.reload();
+    await openRead(page);
+    await expect(page.getByText(/three times in a row/)).toBeVisible();
+    await openStep(page, "Predict");
+    await expect(page.getByText(/^Right\./)).toBeVisible();
+    await expect(page.getByRole("tab", { name: /Predict/ })).toContainText("✓");
   });
 
   test("solved exercises from the old storage format still show as solved", async ({ page }) => {
@@ -50,8 +73,9 @@ test.describe("progress", () => {
         },
       });
     });
-    await page.goto(EXERCISE);
+    await page.goto(EX_014);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await openStep(page, "Fix");
     await setCode(page, "def average(a, b, c):\n    return 0\n");
   });
 });
