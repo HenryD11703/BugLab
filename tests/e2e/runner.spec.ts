@@ -1,25 +1,14 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { run, setCode, waitForPython } from "./helpers";
 
 // Exercise 014 has no constraints, so every run reaches Python.
 const EXERCISE = "/exercise/014-operator-precedence";
 const FIXED = "def average(a, b, c):\n    return (a + b + c) / 3\n";
 
-async function setCode(page: Page, code: string) {
-  const editor = page.locator(".cm-content");
-  await editor.click();
-  await page.keyboard.press("ControlOrMeta+A");
-  await page.keyboard.insertText(code);
-  // wait for React to see the edit before anything reads it
-  await expect(editor).toContainText(code.split("\n")[0]);
-}
-
-const run = (page: Page) =>
-  page.getByRole("button", { name: /^(Run|Running|Loading Python)/ }).click();
-
 test.describe("Python runner", () => {
   test("stops an infinite loop within the time limit and the page stays usable", async ({ page }) => {
     await page.goto(EXERCISE);
-    await expect(page.getByText("python ready")).toBeVisible();
+    await waitForPython(page);
 
     await setCode(page, "def average(a, b, c):\n    while True:\n        pass\n");
     await run(page);
@@ -33,11 +22,11 @@ test.describe("Python runner", () => {
 
   test("a function from an earlier run cannot satisfy a later one", async ({ page }) => {
     await page.goto(EXERCISE);
-    await expect(page.getByText("python ready")).toBeVisible();
+    await waitForPython(page);
 
     await setCode(page, FIXED);
     await run(page);
-    await expect(page.getByText("All tests passed")).toBeVisible();
+    await expect(page.getByText("All tests passed")).toBeVisible({ timeout: 30_000 });
 
     await setCode(page, "x = 1\n");
     await run(page);
@@ -48,7 +37,7 @@ test.describe("Python runner", () => {
 
   test("shows a Python-style traceback for a runtime error", async ({ page }) => {
     await page.goto(EXERCISE);
-    await expect(page.getByText("python ready")).toBeVisible();
+    await waitForPython(page);
     await setCode(page, "def average(a, b, c):\n    return 1 / 0\n");
     await run(page);
     await expect(page.getByText(/ZeroDivisionError/).first()).toBeVisible();

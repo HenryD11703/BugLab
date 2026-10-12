@@ -7,6 +7,8 @@ export default defineConfig({
   timeout: 90_000, // the first Python run downloads the Pyodide runtime
   expect: { timeout: 15_000 },
   fullyParallel: true,
+  // Several tests download the Python runtime; too many at once starve each other.
+  workers: process.env.CI ? 2 : 4,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",

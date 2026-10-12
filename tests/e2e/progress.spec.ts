@@ -1,15 +1,8 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { run, setCode, waitForPython } from "./helpers";
 
 const EXERCISE = "/exercise/014-operator-precedence";
 const FIXED = "def average(a, b, c):\n    return (a + b + c) / 3\n";
-
-async function setCode(page: Page, code: string) {
-  const editor = page.locator(".cm-content");
-  await editor.click();
-  await page.keyboard.press("ControlOrMeta+A");
-  await page.keyboard.insertText(code);
-  await expect(editor).toContainText(code.split("\n")[0]);
-}
 
 test.describe("progress", () => {
   test("the code a learner wrote survives a reload, and Reset clears it", async ({ page }) => {
@@ -27,10 +20,10 @@ test.describe("progress", () => {
 
   test("a solved exercise shows as solved on the home page after a reload", async ({ page }) => {
     await page.goto(EXERCISE);
-    await expect(page.getByText("python ready")).toBeVisible();
+    await waitForPython(page);
     await setCode(page, FIXED);
-    await page.getByRole("button", { name: /^Run/ }).click();
-    await expect(page.getByText("All tests passed")).toBeVisible();
+    await run(page);
+    await expect(page.getByText("All tests passed")).toBeVisible({ timeout: 30_000 });
 
     await page.goto("/");
     await expect(page.locator('a[href="/exercise/014-operator-precedence"]')).toContainText("solved");
