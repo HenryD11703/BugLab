@@ -4,6 +4,9 @@ import {
   LEGACY_KEY,
   STORAGE_KEY,
   applyAction,
+  hintsForScore,
+  isSolvedEver,
+  isStarted,
   parseProgress,
   solvedIds,
 } from "@/lib/progress-model";
@@ -19,7 +22,12 @@ describe("parseProgress", () => {
   it("round-trips valid data", () => {
     const data = {
       version: 2,
-      exercises: { "001-a": { code: "x = 1", hintsOpened: 2, done: { locate: true, fix: true } } },
+      exercises: {
+        "001-a": {
+          code: "x = 1", hintsOpened: 2, done: { locate: true, fix: true },
+          wrong: { predict: 2 }, failedRuns: 3, solutionViewed: true, hintsAtSolve: 1, best: 87,
+        },
+      },
     };
     expect(parseProgress(JSON.stringify(data))).toEqual(data);
   });
@@ -34,9 +42,24 @@ describe("parseProgress", () => {
       },
     });
     expect(parseProgress(raw).exercises).toEqual({
-      good: { code: "ok", hintsOpened: 1, done: { fix: true } },
-      weird: { code: undefined, hintsOpened: 0, done: {} },
+      good: { code: "ok", hintsOpened: 1, done: { fix: true }, wrong: {}, failedRuns: 0 },
+      weird: { code: undefined, hintsOpened: 0, done: {}, wrong: {}, failedRuns: 0 },
     });
+  });
+
+  it("reads data saved before scoring existed, with zero mistakes", () => {
+    const old = JSON.stringify({ version: 2, exercises: { a: { code: "x", hintsOpened: 1, done: { fix: true } } } });
+    expect(parseProgress(old).exercises.a).toEqual({ code: "x", hintsOpened: 1, done: { fix: true }, wrong: {}, failedRuns: 0 });
+  });
+
+  it("rejects out-of-range or non-integer scores and counts", () => {
+    const raw = JSON.stringify({
+      version: 2,
+      exercises: { a: { hintsOpened: 0, done: {}, best: 101, failedRuns: -4, wrong: { predict: 1.5, locate: 2 } }, b: { hintsOpened: 0, done: {}, best: "9" } },
+    });
+    const p = parseProgress(raw);
+    expect(p.exercises.a).toEqual({ hintsOpened: 0, done: {}, wrong: { locate: 2 }, failedRuns: 0 });
+    expect(p.exercises.b.best).toBeUndefined();
   });
 
   it("migrates the old list of solved ids", () => {
@@ -128,5 +151,76 @@ describe("browser store", () => {
     const a = await import("@/lib/progress");
     expect(() => a.saveCode("x", "code")).not.toThrow();
     expect(() => a.completeStep("x", "fix")).not.toThrow();
+  });
+});
+
+describe("score events", () => {
+  const start = (over: object = {}) => ({ version: 2 as const, exercises: { x: { hintsOpened: 0, done: {}, wrong: {}, failedRuns: 0, ...over } } });
+
+  it("counts wrong answers per step, one at a time", () => {
+    let s = applyAction(start(), { type: "recordWrong", id: "x", step: "predict" });
+    s = applyAction(s, { type: "recordWrong", id: "x", step: "predict" });
+    s = applyAction(s, { type: "recordWrong", id: "x", step: "locate" });
+    expect(s.exercises.x.wrong).toEqual({ predict: 2, locate: 1 });
+  });
+
+  it("ignores a wrong answer in a step that is already done", () => {
+    const s = start({ done: { predict: true } });
+    expect(applyAction(s, { type: "recordWrong", id: "x", step: "predict" })).toBe(s);
+  });
+
+  it("counts failed runs, but not after Fix is solved", () => {
+    const s = applyAction(start(), { type: "recordFailedRun", id: "x" });
+    expect(s.exercises.x.failedRuns).toBe(1);
+    const solved = start({ done: { fix: true } });
+    expect(applyAction(solved, { type: "recordFailedRun", id: "x" })).toBe(solved);
+  });
+
+  it("only counts the solution as viewed before Fix is solved", () => {
+    expect(applyAction(start(), { type: "solutionShown", id: "x" }).exercises.x.solutionViewed).toBe(true);
+    const solved = start({ done: { fix: true } });
+    expect(applyAction(solved, { type: "solutionShown", id: "x" })).toBe(solved);
+  });
+
+  it("freezes the hint count when Fix is solved, so later hints do not change the score", () => {
+    let s = applyAction(start({ hintsOpened: 2 }), { type: "completeStep", id: "x", step: "fix" });
+    expect(s.exercises.x.hintsAtSolve).toBe(2);
+    s = applyAction(s, { type: "setHintsOpened", id: "x", count: 3 });
+    expect(s.exercises.x.hintsOpened).toBe(3);
+    expect(hintsForScore(s.exercises.x)).toBe(2);
+    expect(hintsForScore(start({ hintsOpened: 1 }).exercises.x)).toBe(1);
+  });
+
+  it("keeps only the best score", () => {
+    let s = applyAction(start(), { type: "recordBest", id: "x", score: 80 });
+    const same = applyAction(s, { type: "recordBest", id: "x", score: 70 });
+    expect(same).toBe(s);
+    s = applyAction(s, { type: "recordBest", id: "x", score: 95.4 });
+    expect(s.exercises.x.best).toBe(95);
+  });
+
+  it("repeat clears the attempt and keeps the best score", () => {
+    const before = start({ code: "x", hintsOpened: 2, done: { predict: true, fix: true }, wrong: { predict: 1 }, failedRuns: 2, solutionViewed: true, hintsAtSolve: 2, best: 77 });
+    const after = applyAction(before, { type: "repeat", id: "x", wasSolved: true });
+    expect(after.exercises.x).toEqual({ hintsOpened: 0, done: {}, wrong: {}, failedRuns: 0, best: 77 });
+    expect(isSolvedEver(after.exercises.x, ["predict", "fix"])).toBe(true);
+    expect(isStarted(after.exercises.x)).toBe(false);
+  });
+
+  it("repeating a solved exercise without a saved score keeps it solved (old data)", () => {
+    const before = start({ done: { fix: true } });
+    const after = applyAction(before, { type: "repeat", id: "x", wasSolved: true });
+    expect(after.exercises.x.best).toBe(0);
+    expect(isSolvedEver(after.exercises.x, ["fix"])).toBe(true);
+  });
+
+  it("repeating something never solved leaves no trace of a score", () => {
+    const after = applyAction(start({ code: "x", failedRuns: 3 }), { type: "repeat", id: "x", wasSolved: false });
+    expect(after.exercises.x.best).toBeUndefined();
+    expect(isSolvedEver(after.exercises.x, ["fix"])).toBe(false);
+  });
+
+  it("repeat on an exercise with no progress changes nothing", () => {
+    expect(applyAction(EMPTY_PROGRESS, { type: "repeat", id: "nope", wasSolved: false })).toBe(EMPTY_PROGRESS);
   });
 });

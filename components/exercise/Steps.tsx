@@ -10,6 +10,8 @@ interface StepProps {
   /** The learner already completed this step (from saved progress). */
   done: boolean;
   onDone: () => void;
+  /** A wrong answer was submitted: it costs points. */
+  onWrong: () => void;
   onSkip: () => void;
   /** Label of the next step, for the Continue button. Null when this is the last one. */
   nextLabel: string | null;
@@ -54,6 +56,7 @@ export function PredictStep({ exercise, ...step }: StepProps & { exercise: Exerc
       step.onDone();
     } else {
       setWrong((n) => n + 1);
+      step.onWrong();
     }
   }
 
@@ -136,6 +139,7 @@ export function LocateStep({ exercise, ...step }: StepProps & { exercise: Exerci
     const v = checkLocate(selected, bugs);
     setVerdict(v);
     if (v.status === "correct") step.onDone();
+    else if (v.status !== "empty") step.onWrong();
   }
 
   return (
@@ -196,6 +200,7 @@ export function ExplainStep({ exercise, ...step }: StepProps & { exercise: Exerc
       step.onDone();
     } else {
       setWrong(true);
+      step.onWrong();
     }
   }
 

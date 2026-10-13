@@ -53,3 +53,31 @@ export async function tabTo(page: Page, matches: (el: Element) => boolean, maxPr
   }
   throw new Error(`Could not reach the element with the keyboard in ${maxPresses} Tab presses`);
 }
+
+/** Does Predict, Locate and Explain of exercise 004 without a single mistake, and lands on Fix. */
+export async function completeReadingSteps(page: Page) {
+  await openStep(page, "Predict");
+  await page.getByPlaceholder("type the output").fill("[1, 2]");
+  await page.getByRole("button", { name: "Check" }).click();
+  await page.getByRole("button", { name: /Continue to Locate/ }).click();
+  await page.getByRole("button", { name: /^Line 1/ }).click();
+  await page.getByRole("button", { name: /^Check line/ }).click();
+  await page.getByRole("button", { name: /Continue to Explain/ }).click();
+  await page.getByRole("radio").nth(1).click();
+  await page.getByRole("button", { name: "Check" }).click();
+  await page.getByRole("button", { name: /Continue to Fix/ }).click();
+}
+
+/** Types the right fix for exercise 004 and runs it. */
+export async function solveFix(page: Page) {
+  await waitForPython(page);
+  await setCode(page, FIXED_004);
+  await run(page);
+  await expect(page.getByText("4 passed")).toBeVisible({ timeout: 30_000 });
+}
+
+/** The live score indicator in the top bar. */
+export const ceiling = (page: Page, n: number) =>
+  page.getByRole("status", { name: `You can still earn up to ${n} points` });
+export const finalScore = (page: Page, total: number, grade: string) =>
+  page.getByRole("status", { name: `Score ${total}, grade ${grade}` });

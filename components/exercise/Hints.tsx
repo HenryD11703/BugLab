@@ -11,10 +11,12 @@ interface HintsProps {
   /** How many hints are open; hints open one at a time, in order. */
   opened: number;
   onOpen: (count: number) => void;
+  /** The solution was shown: it costs points when it happens before solving. */
+  onSolutionShown: () => void;
   solved: boolean;
 }
 
-export default function Hints({ exerciseId, hints, opened, onOpen, solved }: HintsProps) {
+export default function Hints({ exerciseId, hints, opened, onOpen, onSolutionShown, solved }: HintsProps) {
   const unlocked = canShowSolution(opened, hints.length, solved);
   const [solution, setSolution] = useState<{ code: string } | { error: string } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -26,6 +28,7 @@ export default function Hints({ exerciseId, hints, opened, onOpen, solved }: Hin
       if (!res.ok) throw new Error(String(res.status));
       const data = (await res.json()) as { code: string };
       setSolution({ code: data.code });
+      onSolutionShown();
     } catch {
       setSolution({ error: "Could not load the solution. Check your connection and try again." });
     } finally {
@@ -34,6 +37,7 @@ export default function Hints({ exerciseId, hints, opened, onOpen, solved }: Hin
   }
 
   const left = hints.length - opened;
+  const costsPoints = !solved;
 
   return (
     <>
@@ -86,6 +90,9 @@ export default function Hints({ exerciseId, hints, opened, onOpen, solved }: Hin
             </button>
           )}
         </div>
+        {unlocked && !solution && costsPoints && (
+          <p className="solution-warning">Opening it before you solve the exercise makes Fix worth 0 points.</p>
+        )}
         {solution && "error" in solution && <p className="feedback">{solution.error}</p>}
         {solution && "code" in solution && <CodeBlock code={solution.code} label="Reference solution" />}
       </div>

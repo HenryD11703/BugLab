@@ -9,6 +9,7 @@ import {
   type ExerciseProgress,
   type ProgressAction,
   type ProgressData,
+  type ReadingStep,
   type Step,
 } from "./progress-model";
 
@@ -66,6 +67,11 @@ function dispatch(action: ProgressAction) {
 export const saveCode = (id: string, code: string | undefined) => dispatch({ type: "saveCode", id, code });
 export const completeStep = (id: string, step: Step) => dispatch({ type: "completeStep", id, step });
 export const setHintsOpened = (id: string, count: number) => dispatch({ type: "setHintsOpened", id, count });
+export const recordWrong = (id: string, step: ReadingStep) => dispatch({ type: "recordWrong", id, step });
+export const recordFailedRun = (id: string) => dispatch({ type: "recordFailedRun", id });
+export const solutionShown = (id: string) => dispatch({ type: "solutionShown", id });
+export const recordBest = (id: string, score: number) => dispatch({ type: "recordBest", id, score });
+export const repeatExercise = (id: string, wasSolved: boolean) => dispatch({ type: "repeat", id, wasSolved });
 
 /** Progress of one exercise. Before hydration (and on the server) it is empty. */
 export function useExerciseProgress(id: string): ExerciseProgress {

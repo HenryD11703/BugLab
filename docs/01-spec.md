@@ -46,6 +46,28 @@ Each criterion becomes an automated test (unit, E2E or CI gate) unless marked *m
 - AC-15 Adding an exercise requires only a new folder and passing CI. `CONTRIBUTING.md` explains how.
 - AC-16 `npm audit --omit=dev` reports 0 vulnerabilities; `tsc`, `eslint` and the build are clean.
 
+## Score and repeat (added 2026-10-13, owner-approved)
+Every exercise is worth up to **100 points**, split by step: Predict 20, Locate 20, Explain 20, Fix 40 (an exercise with fewer steps is scaled to 100). Mistakes cost points:
+
+| Event | Effect |
+|---|---|
+| A wrong answer in Predict, Locate or Explain | -5 from that step |
+| A run of the tests that does not pass (Fix) | -3 from Fix |
+| Each hint opened | -5 from the total |
+| Opening the solution *before* solving | Fix is worth 0 |
+| A step that is skipped | worth 0 |
+| A step that is completed | worth at least 5 |
+
+The total is clamped to 0-100 and has a grade: **S** from 95, **A** from 80, **B** from 60, **C** below. Solving shows a receipt in the style of a pytest report that lists every line. **Repeat** restarts one exercise from scratch (code, steps, hints and mistakes are cleared) and keeps the **best** score, which is what the home page adds up.
+
+- AC-19 The score of an exercise is a pure function of what the learner did (steps done, wrong answers, failed runs, hints, solution), with the weights and penalties above, and is covered by unit tests.
+- AC-20 The receipt lists every line of the score and its total and grade equal the number shown in the header and on the home page.
+- AC-21 Mistakes are counted exactly once each, survive a reload, and a run that could not happen (runtime unavailable) is not counted as a mistake.
+- AC-22 Opening the solution after solving costs nothing; before solving it sets Fix to 0.
+- AC-23 Repeat clears the code, steps, hints, mistakes and any shown solution of that exercise, asks for confirmation when there is progress, and never lowers the best score.
+- AC-24 The home page shows the best score and grade of each solved exercise, and the total, and a repeated exercise still shows as solved.
+- AC-25 The score interface passes axe (no serious or critical issues) and respects `prefers-reduced-motion`.
+
 ## Non-goals
 Accounts, leaderboards, a server, running code on a server, languages other than Python, AI-generated feedback, an in-app exercise editor.
 

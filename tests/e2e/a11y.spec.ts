@@ -11,6 +11,9 @@ async function seriousViolations(page: Page) {
     .map((v) => `${v.id} (${v.impact}): ${v.nodes.slice(0, 3).map((n) => n.target.join(" ")).join(" | ")}`);
 }
 
+// The receipt animates in; reduced motion is both a requirement (AC-25) and what keeps axe from reading half-faded text.
+test.use({ reducedMotion: "reduce" });
+
 test.describe("accessibility (axe: no serious or critical issues)", () => {
   test("home page", async ({ page }) => {
     await page.goto("/");
@@ -22,11 +25,11 @@ test.describe("accessibility (axe: no serious or critical issues)", () => {
     await page.addInitScript(() => {
       localStorage.setItem(
         "buglab:progress",
-        JSON.stringify({ version: 2, exercises: { "001-off-by-one": { hintsOpened: 1, done: { predict: true, fix: true } } } })
+        JSON.stringify({ version: 2, exercises: { "001-off-by-one": { hintsOpened: 1, done: { predict: true, fix: true }, wrong: {}, failedRuns: 0, best: 88 } } })
       );
     });
     await page.goto("/");
-    await expect(page.getByText("1 of 20 solved")).toBeVisible();
+    await expect(page.getByText(/1 of 20 solved/)).toContainText("88 pts");
     expect(await seriousViolations(page)).toEqual([]);
   });
 
@@ -79,6 +82,12 @@ test.describe("accessibility (axe: no serious or critical issues)", () => {
     await setCode(page, "def append_to(element, to=None):\n    if to is None:\n        to = []\n    to.append(element)\n    return to\n");
     await run.click();
     await expect(page.getByRole("heading", { name: "mutable-default-argument" })).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByRole("region", { name: "Score" })).toBeVisible();
+    expect(await seriousViolations(page)).toEqual([]);
+
+    // the repeat confirmation
+    await page.getByRole("button", { name: /^Repeat/ }).click();
+    await expect(page.getByText(/Start over\?/)).toBeVisible();
     expect(await seriousViolations(page)).toEqual([]);
   });
 });

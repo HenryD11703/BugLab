@@ -11,11 +11,16 @@ const all = fs
 const rows = (page: import("@playwright/test").Page) => page.locator('a[href^="/exercise/"]');
 
 test.describe("home", () => {
-  test("lists every exercise and says nothing about the bugs", async ({ page }) => {
+  test("lists every exercise and says nothing about the bugs", async ({ page, isMobile }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Find the bug");
     await expect(rows(page)).toHaveCount(all.length);
     await expect(page.getByText("not found yet")).toHaveCount(all.length);
+    if (!isMobile) {
+      // on phones the column is dropped on purpose; on desktop it once vanished under Tailwind's "hidden" class
+      await expect(page.getByText("not found yet").first()).toBeVisible();
+      await expect(page.getByText("not found yet").last()).toBeVisible();
+    }
     // a concept that is also a visible topic (019: "truthiness") is not a secret
     for (const e of all.filter((e) => !e.tags.includes(e.concept))) {
       await expect(page.locator("body")).not.toContainText(e.concept);

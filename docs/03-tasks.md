@@ -40,6 +40,16 @@ T01-T04 are independent. T11 needs T10. T12 needs T11. T14 needs T10. T22 needs 
 2. T20 design mockups.
 3. T27 any push, PR or tag.
 
+## Score and repeat (second round)
+| ID | Task | Done when | AC |
+|---|---|---|---|
+| T30 ✅ | `lib/score.ts`: weights, penalties, grade, receipt lines | unit tests for each rule and edge case | 19, 22 |
+| T31 ✅ | Progress model and store: mistakes, failed runs, solution viewed, best score, repeat | unit tests incl. migration of old data | 21, 23 |
+| T32 ✅ | Wire the events: wrong answers, failed runs, hints, solution | E2E: the numbers change as expected and survive a reload | 21, 22 |
+| T33 ✅ | Receipt, live score, grade (Traceback style) and repeat with confirmation | E2E and axe | 20, 23, 25 |
+| T34 ✅ | Home: best score and grade per exercise, total, solved after repeating | E2E | 24 |
+| T35 ✅ | Docs: README and ARCHITECTURE | reviewed | all |
+
 ## Acceptance criteria and what proves each one
 | AC | Proven by |
 |---|---|
@@ -61,3 +71,10 @@ T01-T04 are independent. T11 needs T10. T12 needs T11. T14 needs T10. T22 needs 
 | 16 audit 0, tsc, eslint, build | CI (`npm run lint`, `typecheck`, `test`, `audit --omit=dev`) and a clean `next build` |
 | 17 steps open or skipped any time | `tests/e2e/flow.spec.ts` "any step can be skipped or opened at any time" |
 | 18 solution locked until hints are open | `flow.spec.ts` "the solution stays locked..." (also checks it is not in the page) |
+| 19 score is a pure, tested function | `tests/unit/score.test.ts` |
+| 20 receipt, header and home agree | `tests/e2e/score.spec.ts` "a clean run is worth 100...", "every mistake costs points..." |
+| 21 mistakes counted once, survive reload, runtime outage is not a mistake | `tests/unit/progress.test.ts`, `score.spec.ts` "mistakes survive a reload", "a run that could not happen..." |
+| 22 solution after solving is free, before solving Fix is 0 | `score.spec.ts` "hints and the solution opened after solving cost nothing", "skipped steps are worth 0..." |
+| 23 repeat clears, asks, never lowers the best | `score.spec.ts` "repeat" group, `progress.test.ts` |
+| 24 home shows best score, grade, total, still solved after repeat | `score.spec.ts`, `home.spec.ts` |
+| 25 score UI passes axe, respects reduced motion | `tests/e2e/a11y.spec.ts` (runs with `reducedMotion: "reduce"`; the receipt is visible without its animation) |

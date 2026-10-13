@@ -23,7 +23,7 @@ Kill any server on port 3100 before `test:e2e`: Playwright reuses it and would t
 
 ## Map
 - `exercises/<id>/` content; format in `exercises/README.md`, validated by `lib/schema.ts`.
-- `lib/`: `steps.ts` (grading of the reading steps), `analysis.ts` (rules by parsing), `runner.ts` + `public/python-worker.js` (Python in a worker, 5 s limit), `runExercise.ts`, `progress-model.ts` + `progress.ts`, `markdown.ts`, `highlight.ts`.
+- `lib/`: `steps.ts` (grading of the reading steps), `analysis.ts` (rules by parsing), `runner.ts` + `public/python-worker.js` (Python in a worker, 5 s limit), `runExercise.ts`, `score.ts` (points, grade, receipt lines), `progress-model.ts` + `progress.ts`, `markdown.ts`, `highlight.ts`.
 - `components/exercise/`: the page; `components/home/`: the list; `components/CodeBlock.tsx`, `Markdown.tsx`, `CodeEditor.tsx`.
 - `tests/unit`, `tests/gates` (exercises against real CPython), `tests/e2e`.
 - `docs/ARCHITECTURE.md` explains the decisions; `docs/00-principles.md` are the rules.

@@ -1,15 +1,20 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { describeConstraints } from "@/lib/analysis";
-import { completeStep, saveCode, setHintsOpened, useExerciseProgress, useHydrated } from "@/lib/progress";
-import { isComplete, STEPS, type Step } from "@/lib/progress-model";
+import {
+  completeStep, recordBest, recordFailedRun, recordWrong, repeatExercise, saveCode, setHintsOpened, solutionShown,
+  useExerciseProgress, useHydrated,
+} from "@/lib/progress";
+import { hintsForScore, isComplete, isSolvedEver, isStarted, STEPS, type ReadingStep, type Step } from "@/lib/progress-model";
+import { computeScore, scoreCeiling, type ScoreInput } from "@/lib/score";
 import type { Exercise, RunResult } from "@/lib/types";
 import { Markdown } from "../Markdown";
 import { Wordmark } from "../SiteHeader";
 import FixStep from "./FixStep";
 import Hints from "./Hints";
+import RepeatControl from "./RepeatControl";
 import { ExplainStep, LocateStep, PredictStep } from "./Steps";
 
 const LABEL: Record<Step, string> = { predict: "Predict", locate: "Locate", explain: "Explain", fix: "Fix" };
@@ -23,12 +28,14 @@ interface ExerciseViewProps {
 export default function ExerciseView({ exercise, position, next }: ExerciseViewProps) {
   const progress = useExerciseProgress(exercise.id);
   const hydrated = useHydrated();
-  const steps = STEPS.filter((s) => exercise[s]);
+  const steps = useMemo(() => STEPS.filter((s) => exercise[s]), [exercise]);
   const [active, setActive] = useState<Step>(steps[0]);
   const [mobile, setMobile] = useState<"read" | "work">("read");
   const [result, setResult] = useState<RunResult | null>(null);
   const [seconds, setSeconds] = useState<number | undefined>(undefined);
   const [copied, setCopied] = useState(false);
+  // Bumped by Repeat: remounts the steps and hints so their local state starts clean.
+  const [epoch, setEpoch] = useState(0);
 
   // The saved draft is only known after hydration; until the learner edits,
   // the editor shows it. Once they edit, their own text wins.
@@ -52,6 +59,37 @@ export default function ExerciseView({ exercise, position, next }: ExerciseViewP
   const onFixSolved = useCallback(() => completeStep(exercise.id, "fix"), [exercise.id]);
 
   const solved = isComplete(progress, steps);
+  const solvedEver = isSolvedEver(progress, steps);
+
+  const scoreInput: ScoreInput = {
+    declared: steps,
+    done: progress.done,
+    wrong: progress.wrong,
+    failedRuns: progress.failedRuns,
+    hintsOpened: hydrated ? hintsForScore(progress) : 0,
+    solutionViewed: progress.solutionViewed === true,
+  };
+  const score = computeScore(scoreInput);
+  const ceiling = scoreCeiling(scoreInput);
+  const best = Math.max(progress.best ?? 0, solved ? score.total : 0);
+
+  // Keep the best score of every attempt. Repeating never lowers it.
+  useEffect(() => {
+    if (solved && score.total > (progress.best ?? -1)) recordBest(exercise.id, score.total);
+  }, [solved, score.total, progress.best, exercise.id]);
+
+  const repeat = useCallback(() => {
+    repeatExercise(exercise.id, solvedEver);
+    setEdited(null);
+    setResult(null);
+    setSeconds(undefined);
+    setActive(steps[0]);
+    setEpoch((n) => n + 1);
+    window.scrollTo(0, 0);
+  }, [exercise.id, solvedEver, steps]);
+  const repeatControl = (variant: "bar" | "panel") => (
+    <RepeatControl variant={variant} needsConfirm={isStarted(progress)} best={progress.best} onRepeat={repeat} />
+  );
   const constraints = exercise.fix?.constraints ? describeConstraints(exercise.fix.constraints) : [];
 
   const goNext = (from: Step) => {
@@ -61,6 +99,7 @@ export default function ExerciseView({ exercise, position, next }: ExerciseViewP
   const stepProps = (s: Step) => ({
     done: progress.done[s] === true,
     onDone: () => completeStep(exercise.id, s),
+    onWrong: () => recordWrong(exercise.id, s as ReadingStep),
     onSkip: () => goNext(s),
     nextLabel: steps[steps.indexOf(s) + 1] ? LABEL[steps[steps.indexOf(s) + 1]] : null,
     onContinue: () => goNext(s),
@@ -90,7 +129,25 @@ export default function ExerciseView({ exercise, position, next }: ExerciseViewP
           <span className="crumb" aria-label={`Exercise ${position.n} of ${position.total}`}>
             <b>{String(position.n).padStart(3, "0")}</b> / {String(position.total).padStart(3, "0")}
           </span>
-          <button type="button" className="linkbtn" onClick={share}>{copied ? "copied ✓" : "copy link"}</button>
+          <span className="bar-right">
+            <span
+              className="chip"
+              role="status"
+              aria-label={solved ? `Score ${score.total}, grade ${score.grade}` : `You can still earn up to ${ceiling} points`}
+            >
+              {solved ? (
+                <>
+                  <b>{score.total}</b> pts · <span className={`grade g-${score.grade}`}>{score.grade}</span>
+                </>
+              ) : (
+                <>
+                  up to <b>{ceiling}</b>
+                </>
+              )}
+            </span>
+            {isStarted(progress) && !solved && repeatControl("bar")}
+            <button type="button" className="linkbtn" onClick={share}>{copied ? "copied ✓" : "copy link"}</button>
+          </span>
         </div>
       </header>
 
@@ -124,10 +181,12 @@ export default function ExerciseView({ exercise, position, next }: ExerciseViewP
           )}
 
           <Hints
+            key={epoch}
             exerciseId={exercise.id}
             hints={exercise.hints}
             opened={hydrated ? progress.hintsOpened : 0}
             onOpen={(n) => setHintsOpened(exercise.id, n)}
+            onSolutionShown={() => solutionShown(exercise.id)}
             solved={solved}
           />
         </section>
@@ -153,7 +212,7 @@ export default function ExerciseView({ exercise, position, next }: ExerciseViewP
             ))}
           </div>
 
-          <div className="panel" role="tabpanel" id={`panel-${active}`} aria-labelledby={`tab-${active}`}>
+          <div className="panel" role="tabpanel" id={`panel-${active}`} aria-labelledby={`tab-${active}`} key={`${active}-${epoch}`}>
             {active === "predict" && <PredictStep exercise={exercise} {...stepProps("predict")} />}
             {active === "locate" && <LocateStep exercise={exercise} {...stepProps("locate")} />}
             {active === "explain" && <ExplainStep exercise={exercise} {...stepProps("explain")} />}
@@ -167,8 +226,12 @@ export default function ExerciseView({ exercise, position, next }: ExerciseViewP
                 onResult={onResult}
                 seconds={seconds}
                 onSolved={onFixSolved}
+                onFailedRun={() => recordFailedRun(exercise.id)}
                 solved={progress.done.fix === true}
                 next={next}
+                score={score}
+                best={best}
+                repeatControl={repeatControl("panel")}
               />
             )}
           </div>

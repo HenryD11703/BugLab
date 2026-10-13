@@ -48,6 +48,15 @@ The worker is a plain script in `public/`, not a bundled module, so it has no bu
 ### Progress is a small immutable model behind `useSyncExternalStore`
 `lib/progress-model.ts` has no browser APIs: it parses and migrates stored data (including the old solved-ids key), tolerates corrupt values, and applies actions without mutating. `lib/progress.ts` stores it in `localStorage` and exposes hooks. Storage failures (blocked, full) are swallowed: progress is a convenience and must never break the page.
 
+### The score is a pure function
+`lib/score.ts` turns what the learner did (steps done, wrong answers, failed runs, hints, whether the solution was opened first) into the receipt lines, the total and the grade. Nothing about it depends on React or the browser, so every rule is a unit test. `scoreCeiling` is the same function with every pending step assumed done: it starts at 100 and only goes down, which is what the live indicator in the top bar shows, so a mistake is visible the moment it costs points.
+
+The counters live in the progress model (`wrong`, `failedRuns`, `solutionViewed`, `hintsAtSolve`, `best`) and are guarded: a wrong answer in a step that is already done, a failed run or a solution opened after Fix is solved, and hints opened after solving are never counted. A run that could not happen (no Python runtime) is not a failed run. The best score is saved by the page when the exercise is solved and only ever goes up.
+
+**Repeat** (`repeat` action) clears the attempt (code, steps, hints, counters) and keeps `best`, so the home page still counts the exercise as solved. The page re-keys its steps and hints so their local state starts clean.
+
+*Alternative rejected:* storing the score as a number when solving. It would hide how it was computed and could not show the receipt after a reload.
+
 ### Read-only code shares the editor's grammar
 `lib/highlight.ts` highlights with `@lezer/highlight` on `@lezer/python`, the same grammar CodeMirror uses, and works on the server. `CodeBlock` renders it with line numbers, marked lines and `^^^^` pointers.
 

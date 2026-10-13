@@ -11,7 +11,9 @@ BugLab teaches beginners to *read* Python and spot errors. Each exercise is one 
 | **Explain** | pick the real reason from a few options | stored answer |
 | **Fix** | edit the code and run it against tests | running it, in your browser |
 
-When you solve an exercise it tells you the name of the bug and why it happens. Every step can be skipped or opened at any time, hints open one at a time, and the reference solution unlocks after the last hint.
+Each exercise is worth up to **100 points**: Predict 20, Locate 20, Explain 20 and Fix 40. A wrong answer costs 5, a run of the tests that does not pass costs 3, each hint costs 5, and opening the solution before solving makes Fix worth 0. When you solve an exercise you get a receipt that lists every line, a grade (S, A, B, C), the name of the bug and why it happens. **Repeat** starts an exercise over from scratch and keeps your best score; the home page adds up the best score of each exercise.
+
+ Every step can be skipped or opened at any time (a skipped step is worth 0), hints open one at a time, and the reference solution unlocks after the last hint.
 
 There is no backend, no account and no tracking. Python runs in your browser (Pyodide, in a Web Worker with a 5 second limit), and progress lives in your browser's `localStorage`.
 
