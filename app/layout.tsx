@@ -1,38 +1,32 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Space_Mono } from "next/font/google";
+import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
+const plexSans = IBM_Plex_Sans({
   subsets: ["latin"],
-  variable: "--font-space-grotesk",
-  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-plex-sans",
+  weight: ["400", "500", "600"],
+  display: "swap",
 });
 
-const spaceMono = Space_Mono({
+const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
-  variable: "--font-space-mono",
-  weight: ["400", "700"],
+  variable: "--font-plex-mono",
+  weight: ["400", "500", "600"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "BugLab — Debug. Think. Write.",
+  title: "BugLab — Read the code. Find the bug.",
   description:
-    "BugLab is an open-source coding challenge platform focused on writing and reviewing code, not just solving puzzles.",
-  keywords: ["debugging", "python", "coding", "open source", "buglab"],
+    "Short, broken Python functions. Predict what they do, point at the bug, explain it, then fix it. Runs in your browser, no account.",
+  keywords: ["python", "debugging", "learn python", "code reading", "open source"],
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      className={`${spaceGrotesk.variable} ${spaceMono.variable} h-full`}
-      style={{ fontFamily: "var(--font-space-grotesk), sans-serif" }}
-    >
-      <body className="min-h-full bg-[#FAFAFA] text-[#0A0A0A]">{children}</body>
+    <html lang="en" className={`${plexSans.variable} ${plexMono.variable}`}>
+      <body>{children}</body>
     </html>
   );
 }

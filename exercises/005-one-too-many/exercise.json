@@ -1,0 +1,72 @@
+{
+  "title": "One Too Many",
+  "difficulty": "medium",
+  "tags": [
+    "math",
+    "loops",
+    "counters"
+  ],
+  "concept": "accumulator-initial-value",
+  "description": "The function `average(numbers)` computes the mean of a list, and `passing_grade(scores)` uses it to decide if a student passes (average >= 60).\n\nA student with scores `[60, 70, 80]` — average 70 — should clearly **pass**. But the function says `'fail'`.\n\nThe arithmetic logic looks correct. **Where is the counter going wrong?**",
+  "hints": [
+    "Add a `print(count)` at the end of `average` before the return. Call `average([10, 20, 30])`. What does count equal?",
+    "For a list of 3 elements, count should be 3. But it's 4. Why?",
+    "`count` starts at `1`, so after iterating 3 elements it becomes 4. The denominator is one too large. Initialize `count = 0`."
+  ],
+  "explanation": "`count` started at 1, so after three numbers it was 4 and the sum was divided by one too many. A counter that counts items must start at 0.\n\nCheck the starting value of every accumulator with an input of one or two items.",
+  "predict": {
+    "code": "average([60, 70, 80])",
+    "answer": "52.5"
+  },
+  "locate": {
+    "bugs": [
+      {
+        "lines": [
+          3
+        ]
+      }
+    ]
+  },
+  "explain": {
+    "question": "Why is the average too low?",
+    "options": [
+      "`total / count` does integer division and rounds down",
+      "The loop adds each number twice",
+      "`count` starts at 1, so the sum is divided by one extra"
+    ],
+    "correct": 2
+  },
+  "fix": {
+    "tests": [
+      {
+        "description": "clear pass",
+        "input": "passing_grade([60, 70, 80])",
+        "expected": "pass"
+      },
+      {
+        "description": "exact threshold",
+        "input": "passing_grade([60, 60, 60])",
+        "expected": "pass"
+      },
+      {
+        "description": "clear fail",
+        "input": "passing_grade([40, 50, 45])",
+        "expected": "fail"
+      },
+      {
+        "description": "average is accurate",
+        "input": "average([10, 20, 30])",
+        "expected": "20.0"
+      }
+    ],
+    "constraints": {
+      "mustUseKeyword": [
+        "for"
+      ],
+      "mustNotCall": [
+        "sum",
+        "len"
+      ]
+    }
+  }
+}

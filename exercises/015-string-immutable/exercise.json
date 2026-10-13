@@ -1,34 +1,69 @@
 {
   "title": "Read-Only",
   "difficulty": "easy",
-  "tags": ["strings", "immutability", "types"],
+  "tags": [
+    "strings",
+    "immutability",
+    "types"
+  ],
+  "concept": "immutable-strings",
   "description": "The function `toggle_case_first(s)` should return a new string where the first character's case is toggled — uppercase becomes lowercase, lowercase becomes uppercase. The rest of the string stays the same.\n\nThe function **crashes immediately** with a `TypeError`. Why can't Python do what the code is asking?",
   "hints": [
     "Run the function with any string. Read the error message: *'str' object does not support item assignment*. What does 'item assignment' mean here?",
     "Strings in Python are **immutable** — they cannot be modified after creation. You cannot assign to individual characters like `s[0] = 'X'`. Every string operation must produce a new string.",
     "Instead of modifying in place, build and return a new string using slicing: `return s[0].lower() + s[1:]` (or `.upper()`). `s[1:]` gives you everything from index 1 to the end."
   ],
-  "tests": [
-    {
-      "description": "uppercase first -> lowercase",
-      "input": "toggle_case_first('Hello')",
-      "expectedOutput": "hello"
-    },
-    {
-      "description": "lowercase first -> uppercase",
-      "input": "toggle_case_first('world')",
-      "expectedOutput": "World"
-    },
-    {
-      "description": "rest of string unchanged",
-      "input": "toggle_case_first('Python')",
-      "expectedOutput": "python"
-    },
-    {
-      "description": "single character",
-      "input": "toggle_case_first('a')",
-      "expectedOutput": "A"
-    }
-  ],
-  "requirements": {}
+  "explanation": "Strings cannot be changed in place, so `s[0] = ...` raises `TypeError`. Build a new string instead, for example `s[0].lower() + s[1:]`.\n\nstr, tuple, int and float are immutable: operations on them give you new values.",
+  "predict": {
+    "code": "toggle_case_first('Hello')",
+    "answer": "TypeError"
+  },
+  "locate": {
+    "bugs": [
+      {
+        "lines": [
+          10,
+          12
+        ]
+      }
+    ]
+  },
+  "explain": {
+    "question": "Why does the function crash?",
+    "options": [
+      "`isupper()` returns `None` for the first character",
+      "`lower()` and `upper()` cannot be used on one character",
+      "Strings are immutable, so assigning to `s[0]` is not allowed"
+    ],
+    "correct": 2
+  },
+  "fix": {
+    "tests": [
+      {
+        "description": "uppercase first -> lowercase",
+        "input": "toggle_case_first('Hello')",
+        "expected": "hello"
+      },
+      {
+        "description": "lowercase first -> uppercase",
+        "input": "toggle_case_first('world')",
+        "expected": "World"
+      },
+      {
+        "description": "rest of string unchanged",
+        "input": "toggle_case_first('Python')",
+        "expected": "python"
+      },
+      {
+        "description": "single character",
+        "input": "toggle_case_first('a')",
+        "expected": "A"
+      },
+      {
+        "description": "only the first letter changes",
+        "input": "toggle_case_first('aardvark')",
+        "expected": "Aardvark"
+      }
+    ]
+  }
 }

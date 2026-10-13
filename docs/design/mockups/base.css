@@ -1,0 +1,95 @@
+/* BugLab design mockup: "Traceback" direction.
+   Dark only. No gradients, no rounded cards, no purple. One accent (the caret),
+   one success colour, one hint colour. The grid and the monospace carry the look. */
+
+:root {
+  --ink: #0c0d0f;
+  --panel: #121418;
+  --panel-2: #181b20;
+  --rule: #262a31;
+  --rule-strong: #3a3f48;
+  --text: #e9e6df;
+  --dim: #9096a0;
+  --faint: #5d626b;
+
+  --caret: #ff6b4a;       /* the pointer under the bug, errors, failures */
+  --pass: #78d9a0;        /* solved, tests passed */
+  --hint: #e6c15a;        /* hints, the line you marked */
+
+  --syn-kw: #ff8d6e;
+  --syn-str: #a6d98b;
+  --syn-num: #e6c15a;
+  --syn-fn: #7aa8f0;
+  --syn-com: #5d626b;
+
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --gutter: 16px;
+  --page: 1160px;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--ink); color-scheme: dark; }
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--text);
+  font: 400 16px/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+code, pre, .mono { font-family: var(--mono); }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
+
+.wrap { max-width: var(--page); margin: 0 auto; padding: 0 var(--gutter); }
+
+/* ---------- top bar ---------- */
+.bar { border-bottom: 1px solid var(--rule); }
+.bar .wrap { display: flex; align-items: center; justify-content: space-between; height: 52px; }
+.wordmark { font: 600 15px/1 var(--mono); letter-spacing: 0.01em; position: relative; display: inline-block; padding-bottom: 12px; }
+.wordmark::after {
+  content: "^^^"; position: absolute; left: 0; bottom: -1px;
+  color: var(--caret); font-size: 11px; letter-spacing: 0.02em; font-weight: 600;
+}
+.nav { display: flex; gap: 22px; font: 500 12px/1 var(--mono); color: var(--dim); text-transform: lowercase; }
+.nav a:hover { color: var(--text); }
+
+/* ---------- small labels ---------- */
+.label { font: 500 11px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); }
+.dim { color: var(--dim); }
+
+/* ---------- code ---------- */
+.code { margin: 0; border: 1px solid var(--rule); background: var(--panel); font: 400 14px/1.7 var(--mono); overflow-x: auto; }
+.code .l { display: flex; min-width: max-content; }
+.code .n { flex: none; width: 44px; padding-right: 14px; text-align: right; color: var(--faint); user-select: none; border-right: 1px solid var(--rule); margin-right: 16px; }
+.code .t { white-space: pre; padding-right: 16px; }
+.code .l.bug { background: rgba(255, 107, 74, 0.09); box-shadow: inset 2px 0 0 var(--caret); }
+.code .l.mark { background: rgba(230, 193, 90, 0.10); box-shadow: inset 2px 0 0 var(--hint); }
+.code .l.ptr .n { border-right-color: transparent; }
+.code .l.ptr .t { color: var(--caret); font-weight: 600; }
+.code.pick .l:not(.ptr) { cursor: pointer; }
+.code.pick .l:not(.ptr):hover { background: rgba(233, 230, 223, 0.045); }
+.k { color: var(--syn-kw); } .s { color: var(--syn-str); } .m { color: var(--syn-num); }
+.f { color: var(--syn-fn); } .c { color: var(--syn-com); font-style: italic; }
+
+/* ---------- tags / marks ---------- */
+.tag { font: 500 11px/1 var(--mono); color: var(--dim); }
+.tag + .tag::before { content: "·"; margin: 0 7px; color: var(--faint); }
+.diff { font: 500 12px/1 var(--mono); }
+.diff.easy { color: var(--pass); } .diff.medium { color: var(--hint); } .diff.hard { color: var(--caret); }
+.steps { font: 500 11px/1 var(--mono); letter-spacing: 0.14em; color: var(--rule-strong); }
+.steps b { font-weight: 600; } .steps .on { color: var(--pass); }
+
+/* ---------- buttons ---------- */
+.btn { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px; font: 600 13px/1 var(--mono); border: 1px solid var(--text); color: var(--ink); background: var(--text); }
+.btn:hover { background: #fff; }
+.btn.ghost { background: transparent; color: var(--text); border-color: var(--rule-strong); }
+.btn.ghost:hover { border-color: var(--text); }
+.btn[disabled] { opacity: 0.35; cursor: not-allowed; }
+.kbd { font: 500 11px/1 var(--mono); color: var(--faint); border: 1px solid var(--rule); padding: 3px 6px; }
+
+:focus-visible { outline: 2px solid var(--hint); outline-offset: 2px; }
+
+.note { position: fixed; right: 12px; bottom: 12px; z-index: 5; max-width: 300px; padding: 10px 12px; background: var(--panel-2); border: 1px solid var(--rule-strong); font: 400 12px/1.5 var(--mono); color: var(--dim); }
+.note b { color: var(--text); font-weight: 600; }
+@media (max-width: 760px) { .note { display: none; } }
