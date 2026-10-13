@@ -146,7 +146,7 @@ test.describe("score", () => {
 test.describe("repeat", () => {
   test("there is nothing to repeat before the learner does anything", async ({ page }) => {
     await page.goto(EX_004);
-    await expect(page.getByRole("button", { name: "repeat", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "↺ repeat", exact: true })).toHaveCount(0);
   });
 
   test("repeat asks first, and cancel changes nothing", async ({ page }) => {
@@ -155,7 +155,7 @@ test.describe("repeat", () => {
     await page.getByPlaceholder("type the output").fill("[2]");
     await page.getByRole("button", { name: "Check" }).click();
 
-    await page.getByRole("button", { name: "repeat", exact: true }).click();
+    await page.getByRole("button", { name: "↺ repeat", exact: true }).click();
     await expect(page.getByText(/Start over\?/)).toBeVisible();
     await page.getByRole("button", { name: "Cancel" }).click();
     await expect(page.getByText(/Start over\?/)).toHaveCount(0);
@@ -241,12 +241,31 @@ test.describe("repeat", () => {
     await page.getByRole("button", { name: "Check" }).click();
     await expect(page.getByRole("tab", { name: /Predict/ })).toContainText("✓");
 
-    await page.getByRole("button", { name: "repeat", exact: true }).click();
+    await page.getByRole("button", { name: "↺ repeat", exact: true }).click();
     await page.getByRole("button", { name: "Yes, repeat" }).click();
     await expect(page.getByRole("tab", { name: /Predict/ })).not.toContainText("✓");
     await expect(page.getByPlaceholder("type the output")).toBeVisible();
     // nothing was solved, so nothing is left behind on the home page
     await page.goto("/");
     await expect(page.getByText(/0 of 20 solved/)).toBeVisible();
+  });
+
+  test("after solving, repeat is in the top bar on every step, not only on the solved panel", async ({ page }) => {
+    await page.goto(EX_004);
+    await completeReadingSteps(page);
+    await solveFix(page);
+    await expect(total(page)).toHaveText("100");
+
+    // go back to a reading step: the solved panel is out of sight, the top bar is not
+    await openStep(page, "Predict");
+    const repeatInBar = page.getByRole("button", { name: "↺ repeat", exact: true });
+    await expect(repeatInBar).toBeVisible();
+    await repeatInBar.click();
+    await expect(page.getByText(/Start over\? Your best \(100\) is kept\./)).toBeVisible();
+    await page.getByRole("button", { name: "Yes, repeat" }).click();
+    await expect(ceiling(page, 100)).toBeVisible();
+    await expect(page.getByRole("tab", { name: /Fix/ })).not.toContainText("✓");
+    // a fresh attempt with nothing done: nothing to repeat until the learner does something
+    await expect(repeatInBar).toHaveCount(0);
   });
 });

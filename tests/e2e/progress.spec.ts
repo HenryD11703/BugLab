@@ -78,4 +78,21 @@ test.describe("progress", () => {
     await openStep(page, "Fix");
     await setCode(page, "def average(a, b, c):\n    return 0\n");
   });
+
+  test("an exercise in progress shows a plain status, not a stray rule or padding", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        "buglab:progress",
+        JSON.stringify({ version: 2, exercises: { "006-closure-trap": { hintsOpened: 1, done: { predict: true }, wrong: {}, failedRuns: 0 } } })
+      );
+    });
+    await page.goto("/");
+    const status = page.locator('a[href="/exercise/006-closure-trap"] .state');
+    await expect(status).toHaveText("in progress");
+    const style = await status.evaluate((el) => {
+      const s = getComputedStyle(el);
+      return { border: s.borderBottomWidth, padding: s.paddingTop };
+    });
+    expect(style).toEqual({ border: "0px", padding: "0px" });
+  });
 });

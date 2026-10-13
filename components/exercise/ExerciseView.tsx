@@ -145,7 +145,7 @@ export default function ExerciseView({ exercise, position, next }: ExerciseViewP
                 </>
               )}
             </span>
-            {isStarted(progress) && !solved && repeatControl("bar")}
+            {isStarted(progress) && repeatControl("bar")}
             <button type="button" className="linkbtn" onClick={share}>{copied ? "copied ✓" : "copy link"}</button>
           </span>
         </div>

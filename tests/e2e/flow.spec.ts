@@ -93,3 +93,18 @@ test.describe("an exercise from start to finish", () => {
     await expect(page.getByRole("button", { name: /^hint 3/ })).toHaveCount(0);
   });
 });
+
+test.describe("step tabs", () => {
+  test("never show a scrollbar of their own on desktop widths", async ({ page, isMobile }) => {
+    test.skip(isMobile, "phones use a grid, covered by the layout spec");
+    for (const width of [1440, 1100, 920]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(EX_004);
+      const overflow = await page.locator(".tabs").evaluate((el) => ({
+        x: el.scrollWidth - el.clientWidth,
+        y: el.scrollHeight - el.clientHeight,
+      }));
+      expect(overflow, `tabs overflow at ${width}px`).toEqual({ x: 0, y: 0 });
+    }
+  });
+});

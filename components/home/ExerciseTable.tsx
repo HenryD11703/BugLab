@@ -94,7 +94,7 @@ export default function ExerciseTable({ rows }: { rows: ExerciseRow[] }) {
                 <span className={`diff ${r.difficulty}`}>{r.difficulty}</span>
               </span>
               <span className="statecell">
-                <span className={`state ${s}`}>{s === "solved" ? "● solved" : s === "progress" ? "in progress" : "open"}</span>
+                <span className={`state ${s === "progress" ? "doing" : s}`}>{s === "solved" ? "● solved" : s === "progress" ? "in progress" : "open"}</span>
                 {s === "solved" && p?.best !== undefined && p.best > 0 && (
                   <span className="rowscore">
                     <span className="sr-only">Best score </span>

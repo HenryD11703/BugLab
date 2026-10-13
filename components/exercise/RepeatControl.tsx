@@ -46,7 +46,7 @@ export default function RepeatControl({ needsConfirm, onRepeat, variant, best }:
       className={buttonClass}
       onClick={() => (needsConfirm ? setAsking(true) : onRepeat())}
     >
-      {variant === "bar" ? "repeat" : "Repeat ↺"}
+      {variant === "bar" ? "↺ repeat" : "Repeat ↺"}
     </button>
   );
 }
